@@ -3,7 +3,7 @@
 import type { IncomingHttpHeaders, IncomingMessage, ServerResponse } from 'node:http'
 
 /** Exact same-origin route owned by this plugin. */
-export const SETTINGS_PATH = '/web-search-multi/settings'
+export const SETTINGS_PATH = '/lemoncat7-web-search/settings'
 
 /** Credential status safe to render in a browser. */
 export interface CredentialStatus {

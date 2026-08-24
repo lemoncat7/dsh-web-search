@@ -6,7 +6,7 @@ const ENDPOINT = 'https://api.tavily.com/search'
 
 /** Tavily Search API backend. */
 export class TavilyBackend implements SearchBackend {
-  readonly id = 'configurable-search'
+  readonly id = 'lemoncat7-search'
   readonly kind = 'tavily'
 
   constructor(

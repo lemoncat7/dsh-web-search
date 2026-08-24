@@ -2,5 +2,5 @@
   config:
     searchProvider: deepseek-official
 
-- id: web-search-multi
+- id: lemoncat7-web-search
   disabled: true

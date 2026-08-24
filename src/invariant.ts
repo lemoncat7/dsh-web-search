@@ -3,10 +3,10 @@
 import type { Context } from '@deepseek-ai/cordis'
 import type { InvariantInstaller } from '@deepseek-ai/dsh-invariants'
 
-const PACKAGE_NAME = 'dsh-web-search-multi'
+const PACKAGE_NAME = '@lemoncat7/dsh-web-search'
 
 /** Cordis companion plugin name. */
-export const name = 'web-search-multi-invariant'
+export const name = 'lemoncat7-web-search-invariant'
 /** Service required before reserving package ownership. */
 export const inject = ['invariants']
 

@@ -7,13 +7,13 @@ import type { PropsLocale, TranslateNS } from '@deepseek-ai/dsh-client-ui-slots'
 import { useEffect, useState, type CSSProperties, type ReactNode } from 'react'
 import { en, zh, type WebSearchMultiLocaleKey } from './locales.ts'
 
-const SETTINGS_PATH = '/web-search-multi/settings'
-const LOCALE_NAMESPACE = 'web-search-multi'
+const SETTINGS_PATH = '/lemoncat7-web-search/settings'
+const LOCALE_NAMESPACE = 'lemoncat7-web-search'
 
 declare module '@deepseek-ai/dsh-client-ui-slots' {
   interface LocaleNamespaceMap {
     /** Copy for the multi-provider web-search settings card. */
-    'web-search-multi': WebSearchMultiLocaleKey
+    'lemoncat7-web-search': WebSearchMultiLocaleKey
   }
 }
 
@@ -69,10 +69,10 @@ export const inject = ['slots', 'locale']
 
 /** Register one plugin-owned card in DSH's existing plugin settings page. */
 export function apply(ctx: ClientContext): void {
-  ctx.effect(() => ctx.locale.register(LOCALE_NAMESPACE, { zh, en }), 'web-search-multi: dictionaries')
+  ctx.effect(() => ctx.locale.register(LOCALE_NAMESPACE, { zh, en }), 'lemoncat7-web-search: dictionaries')
   ctx.slots.inject('settings.plugin.item', () => ctx.slots.register({
     name: 'settings.plugin.item',
-    key: 'web-search-multi',
+    key: 'lemoncat7-web-search',
     locale: LOCALE_NAMESPACE,
   }, MultiSearchSettingsCard))
 }

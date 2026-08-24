@@ -1,9 +1,10 @@
 # Changelog
 
-## 0.2.0
+## 0.1.0-alpha.2
 
-- Add one selectable DSH-native search provider for SearXNG, Wikipedia, Tavily, Brave, and Gemini.
-- Add bilingual Web settings, credential-backed API-key editing, and live draft testing.
-- Add Gemini Search Grounding with URL Context for explicit HTTP(S) URLs.
-- Default new installations to keyless Wikipedia and bound external JSON responses to 2 MiB.
-- Align the package and browser client with DSH 0.1.1-rc.2.
+- Provide one stable DSH-native `web_search` tool backed by SearXNG, Wikipedia, Tavily, Brave, or Gemini.
+- Add bilingual settings, credential-backed API-key editing, and real draft testing.
+- Default new installations to keyless Chinese Wikipedia.
+- Add a plugin-scoped `DSH_WEB_SEARCH_PROXY` transport without changing networking for other DSH services.
+- Validate external JSON, reject redirects, cap responses at 2 MiB, and preserve caller cancellation.
+- Target DSH 0.1.1-rc.2 on Node.js 22.19/24.

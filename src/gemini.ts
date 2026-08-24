@@ -7,7 +7,7 @@ const HTTP_URL_PATTERN = /https?:\/\/[^\s<>"'`]+/i
 
 /** Gemini API backend grounded with Google Search. */
 export class GeminiBackend implements SearchBackend {
-  readonly id = 'configurable-search'
+  readonly id = 'lemoncat7-search'
   readonly kind = 'gemini'
 
   constructor(

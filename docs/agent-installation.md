@@ -12,12 +12,12 @@ This guide is for an agent installing the plugin on a user's existing DSH profil
 ## Install from GitHub
 
 ```sh
-dsh plugin --profile web add github:zmh2000829/dsh-web-search-multi
+dsh plugin --profile web add github:lemoncat7/dsh-web-search
 ```
 
 If pnpm reports that the Git dependency's build script was blocked, follow its `allowBuilds` instruction and repeat the command. Do not enable unrelated package build scripts.
 
-The bundle selects `configurable-search` and configures the local SearXNG endpoint `http://127.0.0.1:8080`; it does not start SearXNG. Start the included service from a checkout when that endpoint is not already available:
+The bundle selects `lemoncat7-search`; it does not start SearXNG. Start the included service from a checkout when a configured endpoint is not already available:
 
 ```sh
 docker compose -f deploy/searxng/compose.yml up -d
@@ -30,16 +30,16 @@ Edit `$DSH_HOME/profiles/web/cordis.patch.yml` and use one complete configuratio
 ## Verify
 
 ```sh
-dsh --profile web --dump-config | grep -E 'configurable-search|web-search-multi'
+dsh --profile web --dump-config | grep -E 'lemoncat7-search|lemoncat7-web-search'
 dsh web
 ```
 
-Confirm that the selected provider returns results, then compare the profile dependency and bundle lists with their pre-install values. Only the `dsh-web-search-multi` entries should be new.
+Confirm that the selected provider returns results, then compare the profile dependency and bundle lists with their pre-install values. Only the `@lemoncat7/dsh-web-search` entries should be new.
 
 ## Remove
 
-Remove profile overrides that target `web-search-multi`, then run:
+Remove profile overrides that target `lemoncat7-web-search`, then run:
 
 ```sh
-dsh plugin --profile web remove dsh-web-search-multi
+dsh plugin --profile web remove @lemoncat7/dsh-web-search
 ```

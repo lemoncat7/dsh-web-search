@@ -4,7 +4,7 @@ import type { SearchBackend } from './types.ts'
 
 /** Keyless Wikipedia full-text search backend. */
 export class WikipediaBackend implements SearchBackend {
-  readonly id = 'configurable-search'
+  readonly id = 'lemoncat7-search'
   readonly kind = 'wikipedia'
 
   constructor(private readonly language: string, private readonly requestTimeoutMs = DEFAULT_REQUEST_TIMEOUT_MS) {}

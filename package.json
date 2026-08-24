@@ -1,16 +1,16 @@
 {
-  "name": "dsh-web-search-multi",
-  "version": "0.2.0",
-  "description": "Configurable SearXNG, Brave, Tavily, Gemini, and Wikipedia search provider for DeepSeek Harness",
-  "homepage": "https://github.com/zmh2000829/dsh-web-search-multi#readme",
+  "name": "@lemoncat7/dsh-web-search",
+  "version": "0.1.0-alpha.2",
+  "description": "Configurable and secure multi-provider web search for DeepSeek Harness",
+  "homepage": "https://github.com/lemoncat7/dsh-web-search#readme",
   "bugs": {
-    "url": "https://github.com/zmh2000829/dsh-web-search-multi/issues"
+    "url": "https://github.com/lemoncat7/dsh-web-search/issues"
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/zmh2000829/dsh-web-search-multi.git"
+    "url": "git+https://github.com/lemoncat7/dsh-web-search.git"
   },
-  "author": "zmh2000829",
+  "author": "lemoncat7",
   "type": "module",
   "sideEffects": false,
   "main": "lib/index.js",
@@ -84,7 +84,8 @@
     "registry": "https://registry.npmjs.org/"
   },
   "dependencies": {
-    "@deepseek-ai/schemastery": "^3.18.1"
+    "@deepseek-ai/schemastery": "^3.18.1",
+    "undici": "^7.16.0"
   },
   "peerDependencies": {
     "@deepseek-ai/cordis": "^4.0.1",

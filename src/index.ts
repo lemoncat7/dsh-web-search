@@ -24,7 +24,7 @@ export type { BraveConfig, CredentialReader, GeminiConfig, ProviderKind, SearchB
 export { WikipediaBackend } from './wikipedia.ts'
 
 /** Stable provider id selected by the host `web` service. */
-export const PROVIDER_ID = 'configurable-search'
+export const PROVIDER_ID = 'lemoncat7-search'
 /** Default key environment variable for Brave Search. */
 export const BRAVE_API_KEY_ENV = 'BRAVE_SEARCH_API_KEY'
 /** Default key environment variable for Tavily. */
@@ -36,10 +36,10 @@ export const DEFAULT_GEMINI_MODEL = 'gemini-3.5-flash-lite'
 /** Default SearXNG instance configured by the shipped bundle. */
 export const SEARXNG_BASE_URL_ENV = 'SEARXNG_BASE_URL'
 /** Settings namespace consumed by the browser card and Host provider. */
-export const WEB_SEARCH_MULTI_SETTINGS_NAMESPACE = settingsNamespace('web-search-multi')
+export const WEB_SEARCH_MULTI_SETTINGS_NAMESPACE = settingsNamespace('lemoncat7-web-search')
 
 /** Cordis plugin name used in loader diagnostics. */
-export const name = 'web-search-multi'
+export const name = 'lemoncat7-web-search'
 /** Host service required by this provider. */
 export const inject = ['web', 'credentials']
 
@@ -226,7 +226,7 @@ export function apply(ctx: Context, config: Config): void {
           return snapshot()
         },
       }),
-    }), 'web-search-multi: browser settings route')
+    }), 'lemoncat7-web-search: browser settings route')
   })
 }
 

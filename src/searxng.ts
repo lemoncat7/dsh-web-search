@@ -5,7 +5,7 @@ import type { SearchBackend, SearxngConfig } from './types.ts'
 
 /** SearXNG backend using a configured instance's keyless JSON endpoint. */
 export class SearxngBackend implements SearchBackend {
-  readonly id = 'configurable-search'
+  readonly id = 'lemoncat7-search'
   readonly kind = 'searxng'
 
   constructor(

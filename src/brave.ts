@@ -6,7 +6,7 @@ const ENDPOINT = 'https://api.search.brave.com/res/v1/web/search'
 
 /** Brave Web Search API backend. */
 export class BraveBackend implements SearchBackend {
-  readonly id = 'configurable-search'
+  readonly id = 'lemoncat7-search'
   readonly kind = 'brave'
 
   constructor(

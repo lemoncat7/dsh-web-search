@@ -44,7 +44,7 @@ for (const file of files) {
 }
 
 const patch = await readFile(new URL('../cordis.patch.yml', import.meta.url), 'utf8')
-assert.match(patch, /searchProvider: configurable-search/)
-assert.match(patch, /name: dsh-web-search-multi/)
+assert.match(patch, /searchProvider: lemoncat7-search/)
+assert.match(patch, /name: '@lemoncat7\/dsh-web-search'/)
 
 process.stdout.write(`PASS package contents (${String(files.size)} files)\n`)

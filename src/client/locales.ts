@@ -1,7 +1,7 @@
 /** Simplified Chinese dictionary (the key-set source of truth). */
 export const zh = {
-  'card.name': '多源网页搜索', 'card.description': '传统搜索与 Gemini AI Grounded Search，可配置、可测试。',
-  'card.expand': '展开设置：多源网页搜索', 'card.collapse': '收起设置：多源网页搜索',
+  'card.name': '联网搜索', 'card.description': '统一配置 SearXNG、Brave、Tavily、Gemini 与 Wikipedia。',
+  'card.expand': '展开设置：联网搜索', 'card.collapse': '收起设置：联网搜索',
   'status.unsaved': '未保存', 'status.loading': '正在读取配置…', 'status.failure': '测试或保存失败：',
   'status.success': '连接成功 · {count} 条结果 · {duration} ms',
   'action.test': '测试配置', 'action.testing': '测试中…', 'action.discard': '放弃修改', 'action.save': '保存', 'action.saving': '保存中…',
@@ -31,8 +31,8 @@ export type WebSearchMultiLocaleKey = keyof typeof zh
 
 /** English dictionary, checked against the complete Chinese key set. */
 export const en = {
-  'card.name': 'Multi-provider web search', 'card.description': 'Configurable, testable traditional search and Gemini AI Grounded Search.',
-  'card.expand': 'Expand settings: multi-provider web search', 'card.collapse': 'Collapse settings: multi-provider web search',
+  'card.name': 'Web search', 'card.description': 'Configure SearXNG, Brave, Tavily, Gemini, and Wikipedia in one place.',
+  'card.expand': 'Expand settings: web search', 'card.collapse': 'Collapse settings: web search',
   'status.unsaved': 'Unsaved', 'status.loading': 'Loading configuration…', 'status.failure': 'Test or save failed: ',
   'status.success': 'Connected · {count} results · {duration} ms',
   'action.test': 'Test configuration', 'action.testing': 'Testing…', 'action.discard': 'Discard changes', 'action.save': 'Save', 'action.saving': 'Saving…',

@@ -1,11 +1,14 @@
 import { WebError } from '@deepseek-ai/dsh-web'
+import { ProxyAgent, type Dispatcher } from 'undici'
 
 /** Default deadline kept below the Harness web-search tool deadline. */
 export const DEFAULT_REQUEST_TIMEOUT_MS = 25_000
 /** Maximum bytes accepted from any external JSON response. */
 export const MAX_RESPONSE_BYTES = 2 * 1024 * 1024
 
-const USER_AGENT = 'dsh-web-search-multi/0.2.0 (+https://github.com/zmh2000829/dsh-web-search-multi)'
+const USER_AGENT = '@lemoncat7/dsh-web-search/0.1.0-alpha.2 (+https://github.com/lemoncat7/dsh-web-search)'
+let proxyAgent: ProxyAgent | undefined
+let proxyAgentURL: string | undefined
 
 /** Per-request transport controls shared by every backend. */
 export interface FetchJsonOptions {
@@ -31,6 +34,7 @@ export async function fetchJson(
 
   let response: Response
   try {
+    const dispatcher = dispatcherFor(url)
     response = await fetch(url, {
       ...init,
       redirect: 'error',
@@ -40,7 +44,8 @@ export async function fetchJson(
         ...init.headers,
       },
       signal: requestSignal,
-    })
+      ...(dispatcher === undefined ? {} : { dispatcher }),
+    } as RequestInit & { dispatcher?: Dispatcher })
   } catch (error: unknown) {
     clearTimeout(timeout)
     if (options.signal?.aborted === true || (isAbortError(error) && !timeoutController.signal.aborted)) {
@@ -91,6 +96,64 @@ export async function fetchJson(
   } finally {
     clearTimeout(timeout)
   }
+}
+
+/**
+ * Resolve the plugin-only outbound proxy. This deliberately does not install a
+ * global dispatcher, so model providers and other DSH plugins keep their own
+ * network policy. Private and explicitly excluded hosts stay direct for local
+ * SearXNG deployments.
+ */
+function dispatcherFor(input: string | URL): Dispatcher | undefined {
+  const proxyURL = process.env.DSH_WEB_SEARCH_PROXY?.trim()
+  if (proxyURL === undefined || proxyURL.length === 0) return undefined
+  const destination = new URL(input)
+  if (bypassProxy(destination.hostname)) return undefined
+  validateProxyURL(proxyURL)
+  if (proxyAgent === undefined || proxyAgentURL !== proxyURL) {
+    void proxyAgent?.close()
+    proxyAgent = new ProxyAgent(proxyURL)
+    proxyAgentURL = proxyURL
+  }
+  return proxyAgent
+}
+
+function validateProxyURL(value: string): void {
+  let url: URL
+  try {
+    url = new URL(value)
+  } catch (error: unknown) {
+    throw new TypeError('DSH_WEB_SEARCH_PROXY must be an absolute HTTP(S) URL', { cause: error })
+  }
+  if (url.protocol !== 'http:' && url.protocol !== 'https:') {
+    throw new TypeError('DSH_WEB_SEARCH_PROXY must use HTTP or HTTPS')
+  }
+}
+
+function bypassProxy(hostname: string): boolean {
+  const host = hostname.toLocaleLowerCase('en-US').replace(/^\[|\]$/g, '')
+  if (host === 'localhost' || host === '::1' || host.endsWith('.localhost')) return true
+  if (privateIPv4(host)) return true
+  const rules = (process.env.DSH_WEB_SEARCH_NO_PROXY ?? '')
+    .split(',')
+    .map(rule => rule.trim().toLocaleLowerCase('en-US'))
+    .filter(Boolean)
+  return rules.some(rule => {
+    const normalized = rule.startsWith('.') ? rule.slice(1) : rule
+    return host === normalized || host.endsWith(`.${normalized}`)
+  })
+}
+
+function privateIPv4(hostname: string): boolean {
+  const parts = hostname.split('.').map(Number)
+  if (parts.length !== 4 || parts.some(part => !Number.isInteger(part) || part < 0 || part > 255)) return false
+  const first = parts[0] ?? -1
+  const second = parts[1] ?? -1
+  return first === 10
+    || first === 127
+    || (first === 169 && second === 254)
+    || (first === 172 && second >= 16 && second <= 31)
+    || (first === 192 && second === 168)
 }
 
 function responseTooLarge(provider: string): WebError {

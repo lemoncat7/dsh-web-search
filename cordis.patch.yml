@@ -1,12 +1,12 @@
 - id: web
   name: '@deepseek-ai/dsh-web'
   config:
-    searchProvider: configurable-search
+    searchProvider: lemoncat7-search
 
 - insert:
-    - id: web-search-multi
-      name: dsh-web-search-multi
+    - id: lemoncat7-web-search
+      name: '@lemoncat7/dsh-web-search'
       config:
         provider: wikipedia
         wikipedia:
-          language: en
+          language: zh
