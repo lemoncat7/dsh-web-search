@@ -1,7 +1,7 @@
 import { createServer } from 'node:http'
 import type { AddressInfo } from 'node:net'
 import { afterEach, describe, expect, it, vi } from 'vitest'
-import { SETTINGS_PATH, settingsHandler } from '../src/settings-route.ts'
+import { isTrustedSettingsRequest, SETTINGS_PATH, settingsHandler } from '../src/settings-route.ts'
 
 const servers: Array<ReturnType<typeof createServer>> = []
 
@@ -10,6 +10,21 @@ afterEach(async () => {
 })
 
 describe('browser settings route', () => {
+  it('accepts an exact remote same-origin request without accepting cross-site writes', () => {
+    const host = 'dsh.mochencloud.cn:1443'
+    expect(isTrustedSettingsRequest({ headers: {
+      host,
+      origin: `https://${host}`,
+      'sec-fetch-site': 'same-origin',
+    } }, true)).toBe(true)
+    expect(isTrustedSettingsRequest({ headers: { host } }, true)).toBe(false)
+    expect(isTrustedSettingsRequest({ headers: {
+      host,
+      origin: 'https://attacker.example',
+      'sec-fetch-site': 'cross-site',
+    } }, true)).toBe(false)
+  })
+
   it('returns credential status without returning values', async () => {
     const api = {
       read: vi.fn(async () => snapshot()),

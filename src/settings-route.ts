@@ -40,7 +40,7 @@ interface RequestHeaders {
   readonly headers: IncomingHttpHeaders
 }
 
-/** True when a request came from the same loopback DSH Web origin. */
+/** True when a request came from the same DSH Web origin. */
 export function isTrustedSettingsRequest(request: RequestHeaders, requireOrigin: boolean): boolean {
   const rawHost = singleHeader(request.headers, 'host')
   if (rawHost === undefined) return false
@@ -50,7 +50,7 @@ export function isTrustedSettingsRequest(request: RequestHeaders, requireOrigin:
   } catch {
     return false
   }
-  if (!loopback(host.hostname) || singleHeader(request.headers, 'sec-fetch-site') === 'cross-site') return false
+  if (singleHeader(request.headers, 'sec-fetch-site') === 'cross-site') return false
   const origin = singleHeader(request.headers, 'origin')
   if (origin === undefined) return !requireOrigin
   try {
@@ -115,13 +115,6 @@ async function readBody(request: IncomingMessage, maximum: number): Promise<stri
 function singleHeader(headers: IncomingHttpHeaders, name: string): string | undefined {
   const value = headers[name]
   return typeof value === 'string' ? value : undefined
-}
-
-function loopback(hostname: string): boolean {
-  const value = hostname.toLocaleLowerCase('en-US')
-  if (value === 'localhost' || value.endsWith('.localhost') || value === '[::1]') return true
-  const parts = value.split('.')
-  return parts.length === 4 && parts[0] === '127' && parts.every(part => /^\d{1,3}$/.test(part))
 }
 
 function isRecord(value: unknown): value is Record<string, unknown> {

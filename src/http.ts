@@ -6,7 +6,7 @@ export const DEFAULT_REQUEST_TIMEOUT_MS = 25_000
 /** Maximum bytes accepted from any external JSON response. */
 export const MAX_RESPONSE_BYTES = 2 * 1024 * 1024
 
-const USER_AGENT = '@lemoncat7/dsh-web-search/0.1.0-alpha.2 (+https://github.com/lemoncat7/dsh-web-search)'
+const USER_AGENT = '@lemoncat7/dsh-web-search/0.1.0-alpha.3 (+https://github.com/lemoncat7/dsh-web-search)'
 let proxyAgent: ProxyAgent | undefined
 let proxyAgentURL: string | undefined
 

@@ -25,7 +25,7 @@ dsh plugin --profile web add @lemoncat7/dsh-web-search
 ```bash
 npm install
 npm run check
-dsh plugin --profile web add ./dist/lemoncat7-dsh-web-search-0.1.0-alpha.2.tgz
+dsh plugin --profile web add ./dist/lemoncat7-dsh-web-search-0.1.0-alpha.3.tgz
 ```
 
 安装后进入 **设置 → 插件 → 插件配置 → 联网搜索**。可以选择提供方、保存密钥、调整超时和安全搜索，并在保存前执行一次真实测试。
@@ -78,7 +78,7 @@ Brave、Tavily 与 Gemini 的密钥通过 DSH Credential Store 保存，不写�
 - 外部 JSON 响应限制为 2 MiB，并在进入 DSH 前校验结构。
 - 拒绝 HTTP 重定向，避免查询或凭据被静默转发。
 - API Key 只放在提供方规定的认证 Header 中，不出现在 URL 和结果里。
-- 浏览器设置接口执行同源与回环地址检查，限制请求体大小，且不会回显密钥。
+- 浏览器设置接口执行严格同源检查，写请求必须携带与当前 Host 完全匹配的 Origin；接口限制请求体大小且不会回显密钥。
 - 插件只提供搜索，不提供任意 URL 抓取工具。
 
 ## 开发验证

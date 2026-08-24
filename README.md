@@ -36,7 +36,7 @@ The included deployment binds to loopback only. Do not expose it publicly withou
 - External JSON is schema-validated and capped at 2 MiB.
 - HTTP redirects are rejected.
 - API keys are resolved through DSH Credential Store and sent only in provider-defined authorization headers.
-- Browser settings routes enforce same-origin loopback access, cap request bodies, and never return secret values.
+- Browser settings routes enforce exact same-origin writes, cap request bodies, and never return secret values.
 - The plugin implements search only, not arbitrary URL fetching.
 
 ## Proxy

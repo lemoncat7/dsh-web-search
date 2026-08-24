@@ -4,10 +4,10 @@
 2. Run `npm ci && npm run check` on a clean checkout.
 3. Review `npm pack --dry-run` and confirm that no credentials or local configuration are included.
 4. For the first release, publish once with `npm publish --access public --provenance`, then configure this repository as the package's npm trusted publisher.
-5. Create an annotated tag matching `package.json`, such as `v0.1.0-alpha.2`, from the tested commit and publish a GitHub Release. Later releases are published by `.github/workflows/publish.yml` through npm trusted publishing and do not require a local OTP or long-lived npm token.
+5. Create an annotated tag matching `package.json`, such as `v0.1.0-alpha.3`, from the tested commit and publish a GitHub Release. Later releases are published by `.github/workflows/publish.yml` through npm trusted publishing and do not require a local OTP or long-lived npm token.
 
 GitHub users can install a release tag with:
 
 ```sh
-dsh plugin --profile web add github:lemoncat7/dsh-web-search#v0.1.0-alpha.2
+dsh plugin --profile web add github:lemoncat7/dsh-web-search#v0.1.0-alpha.3
 ```

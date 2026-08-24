@@ -1,6 +1,6 @@
 {
   "name": "@lemoncat7/dsh-web-search",
-  "version": "0.1.0-alpha.2",
+  "version": "0.1.0-alpha.3",
   "description": "Configurable and secure multi-provider web search for DeepSeek Harness",
   "homepage": "https://github.com/lemoncat7/dsh-web-search#readme",
   "bugs": {
