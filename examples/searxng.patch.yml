@@ -4,4 +4,6 @@
     searxng:
       baseURL: http://127.0.0.1:8080
       language: all
+      engines: [bing, baidu]
+      retryCount: 1
       safeSearch: 1

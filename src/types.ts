@@ -17,6 +17,8 @@ export interface SearxngConfig {
   readonly baseURL?: string
   readonly language?: string
   readonly categories?: string
+  readonly engines?: string[]
+  readonly retryCount?: number
   readonly safeSearch?: 0 | 1 | 2
 }
 

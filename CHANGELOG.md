@@ -1,5 +1,12 @@
 # Changelog
 
+## 0.1.1
+
+- Discover general-purpose engines from the configured SearXNG `/config` endpoint.
+- Probe engines with bounded concurrency and sort usable engines by measured latency.
+- Let each DSH client select the engines sent with every SearXNG search request.
+- Add configurable retry count for failed or empty SearXNG searches.
+
 ## 0.1.0-alpha.3
 
 - Provide one stable DSH-native `web_search` tool backed by SearXNG, Wikipedia, Tavily, Brave, or Gemini.

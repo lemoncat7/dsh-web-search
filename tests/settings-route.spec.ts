@@ -30,6 +30,7 @@ describe('browser settings route', () => {
       read: vi.fn(async () => snapshot()),
       write: vi.fn(async () => snapshot()),
       test: vi.fn(async () => testResult()),
+      discoverEngines: vi.fn(async () => []),
     }
     const origin = await serve(api)
     const response = await fetch(`${origin}${SETTINGS_PATH}`)
@@ -44,6 +45,7 @@ describe('browser settings route', () => {
       read: vi.fn(async () => snapshot()),
       write: vi.fn(async () => snapshot()),
       test: vi.fn(async () => testResult()),
+      discoverEngines: vi.fn(async () => []),
     }
     const origin = await serve(api)
     const body = JSON.stringify({ config: { provider: 'tavily' }, apiKey: 'secret-value' })
@@ -70,6 +72,7 @@ describe('browser settings route', () => {
       read: vi.fn(async () => snapshot()),
       write: vi.fn(async () => snapshot()),
       test: vi.fn(async () => testResult()),
+      discoverEngines: vi.fn(async () => []),
     }
     const origin = await serve(api)
     const body = JSON.stringify({ config: { provider: 'brave' }, apiKey: 'secret-value' })
@@ -84,6 +87,25 @@ describe('browser settings route', () => {
     const text = await response.text()
     expect(text).toContain('Brave result')
     expect(text).not.toContain('secret-value')
+  })
+
+  it('discovers and probes SearXNG engines without writing settings', async () => {
+    const api = {
+      read: vi.fn(async () => snapshot()),
+      write: vi.fn(async () => snapshot()),
+      test: vi.fn(async () => testResult()),
+      discoverEngines: vi.fn(async () => [{ name: 'bing', categories: ['general'], enabledByDefault: false, tested: true, available: true, resultCount: 3, truncated: false, durationMs: 42 }]),
+    }
+    const origin = await serve(api)
+    const response = await fetch(`${origin}${SETTINGS_PATH}`, {
+      method: 'POST',
+      headers: { 'content-type': 'application/json', origin, 'sec-fetch-site': 'same-origin' },
+      body: JSON.stringify({ action: 'discover-engines', config: { provider: 'searxng' }, query: 'nomifun' }),
+    })
+    expect(response.status).toBe(200)
+    expect(api.discoverEngines).toHaveBeenCalledWith({ provider: 'searxng' }, 'nomifun')
+    expect(api.write).not.toHaveBeenCalled()
+    expect(await response.json()).toEqual([{ name: 'bing', categories: ['general'], enabledByDefault: false, tested: true, available: true, resultCount: 3, truncated: false, durationMs: 42 }])
   })
 })
 

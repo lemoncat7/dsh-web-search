@@ -31,6 +31,8 @@ curl -fsS -X POST http://127.0.0.1:8080/search -d 'q=DeepSeek&format=json'
 
 The included deployment binds to loopback only. Do not expose it publicly without authentication, rate limiting, and the controls recommended by SearXNG.
 
+The settings card can read general-purpose engines from the configured instance, probe them with bounded concurrency, sort successful engines by latency, and save a per-client engine selection. Failed or empty searches can be retried from zero to three times.
+
 ## Security
 
 - External JSON is schema-validated and capped at 2 MiB.

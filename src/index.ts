@@ -11,14 +11,14 @@ import { BraveBackend } from './brave.ts'
 import { GeminiBackend } from './gemini.ts'
 import { DEFAULT_REQUEST_TIMEOUT_MS } from './http.ts'
 import { SETTINGS_PATH, settingsHandler } from './settings-route.ts'
-import { SearxngBackend, endpointFor } from './searxng.ts'
+import { SearxngBackend, discoverSearxngEngines, endpointFor } from './searxng.ts'
 import { TavilyBackend } from './tavily.ts'
 import type { BraveConfig, CredentialReader, GeminiConfig, ProviderKind, SearchBackend, SearxngConfig, TavilyConfig, WikipediaConfig } from './types.ts'
 import { WikipediaBackend } from './wikipedia.ts'
 
 export { BraveBackend } from './brave.ts'
 export { GeminiBackend } from './gemini.ts'
-export { SearxngBackend, endpointFor } from './searxng.ts'
+export { SearxngBackend, discoverSearxngEngines, endpointFor } from './searxng.ts'
 export { TavilyBackend } from './tavily.ts'
 export type { BraveConfig, CredentialReader, GeminiConfig, ProviderKind, SearchBackend, SearxngConfig, TavilyConfig, WikipediaConfig } from './types.ts'
 export { WikipediaBackend } from './wikipedia.ts'
@@ -58,6 +58,8 @@ const SearxngSchema: z<SearxngConfig> = z.object({
   baseURL: z.string(),
   language: z.string().default('all'),
   categories: z.string(),
+  engines: z.array(z.string()),
+  retryCount: z.number().min(0).max(3).step(1).default(1),
   safeSearch: z.union([0, 1, 2] as const).default(1),
 })
 
@@ -114,11 +116,17 @@ export function createBackend(config: Config, environment: EnvironmentReader, cr
       if (settings.categories !== undefined && settings.categories.trim().length === 0) {
         throw new TypeError('searxng.categories must not be blank')
       }
+      const retryCount = settings.retryCount ?? 1
+      if (!Number.isInteger(retryCount) || retryCount < 0 || retryCount > 3) throw new TypeError('searxng.retryCount must be an integer from 0 through 3')
+      if (settings.engines !== undefined && (settings.engines.length > 32 || settings.engines.some(engine => engine.trim().length === 0 || engine.length > 100))) {
+        throw new TypeError('searxng.engines must contain at most 32 non-empty engine names')
+      }
       return new SearxngBackend({
         ...settings,
         baseURL,
         language,
         safeSearch: settings.safeSearch ?? 1,
+        retryCount,
       }, requestTimeoutMs)
     }
     case 'brave': {
@@ -216,6 +224,18 @@ export function apply(ctx: Context, config: Config): void {
             ...firstTitle === undefined ? {} : { firstTitle },
           }
         },
+        discoverEngines: async (value, query) => {
+          const candidate = value as Config
+          if ((candidate.provider ?? 'wikipedia') !== 'searxng') throw new TypeError('engine discovery requires the SearXNG provider')
+          const settings = candidate.searxng ?? {}
+          const baseURL = settings.baseURL ?? environment(SEARXNG_BASE_URL_ENV) ?? ''
+          return discoverSearxngEngines({
+            ...settings,
+            baseURL,
+            language: settings.language ?? 'all',
+            safeSearch: settings.safeSearch ?? 1,
+          }, query)
+        },
         write: async (value, apiKey) => {
           await webCtx.settings.update(WEB_SEARCH_MULTI_SETTINGS_NAMESPACE, value as Config)
           if (apiKey !== undefined && apiKey.trim().length > 0) {
@@ -238,6 +258,8 @@ function configForBrowser(config: Config, environment: EnvironmentReader): Confi
       baseURL: config.searxng?.baseURL ?? environment(SEARXNG_BASE_URL_ENV) ?? '',
       language: config.searxng?.language ?? 'all',
       safeSearch: config.searxng?.safeSearch ?? 1,
+      retryCount: config.searxng?.retryCount ?? 1,
+      ...config.searxng?.engines === undefined ? {} : { engines: config.searxng.engines },
       ...config.searxng?.categories === undefined ? {} : { categories: config.searxng.categories },
     },
     brave: {

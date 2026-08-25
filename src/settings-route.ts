@@ -29,11 +29,24 @@ export interface SettingsTestResult {
   readonly firstTitle?: string | undefined
 }
 
+export interface EngineProbeResult {
+  readonly name: string
+  readonly categories: readonly string[]
+  readonly enabledByDefault: boolean
+  readonly tested: boolean
+  readonly available: boolean
+  readonly resultCount: number
+  readonly truncated: boolean
+  readonly durationMs: number
+  readonly error?: string
+}
+
 /** Server operations exposed through the same-origin settings route. */
 export interface SettingsApi {
   readonly read: () => Promise<BrowserSettingsSnapshot>
   readonly write: (config: unknown, apiKey: string | undefined) => Promise<BrowserSettingsSnapshot>
   readonly test: (config: unknown, apiKey: string | undefined) => Promise<SettingsTestResult>
+  readonly discoverEngines: (config: unknown, query: string) => Promise<readonly EngineProbeResult[]>
 }
 
 interface RequestHeaders {
@@ -91,13 +104,21 @@ export function settingsHandler(api: SettingsApi) {
     }
     try {
       const value = request.method === 'POST'
-        ? await api.test(input.config, apiKey)
+        ? input.action === 'discover-engines'
+          ? await api.discoverEngines(input.config, searchQuery(input.query))
+          : await api.test(input.config, apiKey)
         : await api.write(input.config, apiKey)
       return json(response, 200, value)
     } catch (error: unknown) {
       return json(response, 400, { error: error instanceof Error ? error.message : String(error) })
     }
   }
+}
+
+function searchQuery(value: unknown): string {
+  if (value === undefined) return 'DeepSeek'
+  if (typeof value !== 'string' || value.trim().length === 0 || value.length > 200) throw new Error('query must be a non-empty string of at most 200 characters')
+  return value.trim()
 }
 
 async function readBody(request: IncomingMessage, maximum: number): Promise<string> {

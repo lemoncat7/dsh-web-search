@@ -1,5 +1,5 @@
 import { afterEach, describe, expect, it, vi } from 'vitest'
-import { SearxngBackend, WikipediaBackend, endpointFor } from '../src/index.ts'
+import { SearxngBackend, WikipediaBackend, discoverSearxngEngines, endpointFor } from '../src/index.ts'
 
 afterEach(() => vi.unstubAllGlobals())
 
@@ -9,18 +9,29 @@ describe('SearxngBackend', () => {
       expect(init?.method).toBe('POST')
       expect(String(init?.body)).toContain('q=DeepSeek+Harness')
       expect(String(init?.body)).toContain('format=json')
+      expect(String(init?.body)).toContain('engines=bing%2Cbaidu')
       return jsonResponse({ results: [
         { url: 'https://example.com/a', title: ' A ', content: ' Result ', publishedDate: '2026-08-18T00:00:00Z' },
         { url: 'https://example.com/b', title: 'B' },
       ] })
     })
     vi.stubGlobal('fetch', fetchMock)
-    const provider = new SearxngBackend({ baseURL: 'http://localhost:8080', language: 'all', safeSearch: 1 })
+    const provider = new SearxngBackend({ baseURL: 'http://localhost:8080', language: 'all', safeSearch: 1, engines: ['bing', 'baidu'] })
     await expect(provider.search({ query: 'DeepSeek Harness', maxResults: 1 })).resolves.toEqual({
       sources: [{ url: 'https://example.com/a', title: 'A', snippet: 'Result', publishedAt: '2026-08-18T00:00:00Z' }],
       truncated: true,
     })
     expect(fetchMock).toHaveBeenCalledWith('http://localhost:8080/search', expect.any(Object))
+  })
+
+  it('retries empty results up to the configured count', async () => {
+    const fetchMock = vi.fn()
+      .mockResolvedValueOnce(jsonResponse({ results: [] }))
+      .mockResolvedValueOnce(jsonResponse({ results: [{ url: 'https://example.com/result', title: 'Result' }] }))
+    vi.stubGlobal('fetch', fetchMock)
+    const provider = new SearxngBackend({ baseURL: 'http://localhost:8080', language: 'all', safeSearch: 1, retryCount: 1 })
+    await expect(provider.search({ query: 'DeepSeek', maxResults: 3 })).resolves.toMatchObject({ sources: [{ title: 'Result' }] })
+    expect(fetchMock).toHaveBeenCalledTimes(2)
   })
 
   it('normalizes the instance endpoint and rejects credentials', () => {
@@ -29,6 +40,22 @@ describe('SearxngBackend', () => {
     credentialed.username = 'account'
     credentialed.password = ['not', 'a', 'credential'].join('-')
     expect(endpointFor(credentialed.href)).toBeUndefined()
+  })
+
+  it('discovers general engines and sorts successful probes by latency', async () => {
+    vi.stubGlobal('fetch', vi.fn(async (input: string | URL | Request, init?: RequestInit) => {
+      if (String(input).endsWith('/config')) return jsonResponse({ engines: [
+        { name: 'images-only', categories: ['images'], enabled: true },
+        { name: 'slow', categories: ['general'], enabled: true },
+        { name: 'fast', categories: ['general', 'web'], enabled: false },
+      ] })
+      const engine = new URLSearchParams(String(init?.body)).get('engines')
+      if (engine === 'slow') await new Promise(resolve => setTimeout(resolve, 15))
+      return jsonResponse({ results: [{ url: `https://example.com/${engine}`, title: engine }] })
+    }))
+    const result = await discoverSearxngEngines({ baseURL: 'http://localhost:8080', language: 'all', safeSearch: 1, retryCount: 0 }, 'probe', 2)
+    expect(result.map(item => item.name)).toEqual(['slow', 'fast'])
+    expect(result.map(item => [item.tested, item.available])).toEqual([[true, true], [false, false]])
   })
 })
 

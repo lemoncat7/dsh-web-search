@@ -25,7 +25,7 @@ dsh plugin --profile web add @lemoncat7/dsh-web-search
 ```bash
 npm install
 npm run check
-dsh plugin --profile web add ./dist/lemoncat7-dsh-web-search-0.1.0-alpha.3.tgz
+dsh plugin --profile web add ./dist/lemoncat7-dsh-web-search-0.1.0-alpha.5.tgz
 ```
 
 安装后进入 **设置 → 插件 → 插件配置 → 联网搜索**。可以选择提供方、保存密钥、调整超时和安全搜索，并在保存前执行一次真实测试。
@@ -43,6 +43,8 @@ curl -fsS -X POST http://127.0.0.1:8080/search -d 'q=DeepSeek&format=json'
 
 不要直接把该实例暴露到公网。公网服务需要额外的认证、限流和访问控制。
 
+设置页可以从当前实例的 `/config` 获取通用搜索引擎，受控并发逐个测速，并按可用性和延迟排序。选择的引擎只保存在当前 DSH 配置中；正式搜索还可设置 0–3 次失败或空结果重试。
+
 ## 配置示例
 
 ```yaml
@@ -53,6 +55,8 @@ curl -fsS -X POST http://127.0.0.1:8080/search -d 'q=DeepSeek&format=json'
     searxng:
       baseURL: http://127.0.0.1:8080
       language: zh-CN
+      engines: [bing, baidu]
+      retryCount: 1
       safeSearch: 1
 ```
 

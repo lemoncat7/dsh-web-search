@@ -24,5 +24,6 @@ describe('createBackend', () => {
     expect(() => createBackend({ provider: 'wikipedia', wikipedia: { language: '../en' } }, noEnvironment, noCredential)).toThrow('language subdomain')
     expect(() => createBackend({ provider: 'gemini', gemini: { model: '../gemini' } }, noEnvironment, noCredential)).toThrow('model id')
     expect(() => createBackend({ provider: 'wikipedia', requestTimeoutMs: 999 }, noEnvironment, noCredential)).toThrow('requestTimeoutMs')
+    expect(() => createBackend({ provider: 'searxng', searxng: { baseURL: 'http://localhost:8080', retryCount: 4 } }, noEnvironment, noCredential)).toThrow('retryCount')
   })
 })

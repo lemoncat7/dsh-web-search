@@ -9,6 +9,32 @@ import { en, zh, type WebSearchMultiLocaleKey } from './locales.ts'
 
 const SETTINGS_PATH = '/lemoncat7-web-search/settings'
 const LOCALE_NAMESPACE = 'lemoncat7-web-search'
+const STYLE_ID = 'lemoncat7-web-search-settings-style'
+const settingsCss = `
+.dsh-web-search-settings{list-style:none;overflow:hidden;border:1px solid var(--dsw-alias-border-l2);border-radius:12px;background:var(--dsw-alias-bg-layer-3);color:var(--dsw-alias-label-primary);transition:border-color .16s,background .16s}
+.dsh-web-search-settings:hover{border-color:var(--dsw-alias-label-dimmed)}
+.dsh-web-search-settings.is-open{border-color:var(--dsw-alias-label-dimmed);background:var(--dsw-alias-bg-layer-2)}
+.dsh-web-search-settings__header{appearance:none;display:flex;width:100%;box-sizing:border-box;align-items:center;gap:12px;padding:14px 16px;border:0;border-radius:12px;background:transparent;color:inherit;text-align:left;cursor:pointer;font:inherit}
+.dsh-web-search-settings__header:focus-visible{outline:2px solid var(--dsw-alias-brand-primary);outline-offset:-2px}
+.dsh-web-search-settings__copy{display:flex;min-width:0;flex:1;flex-direction:column;gap:4px}
+.dsh-web-search-settings__copy strong{font-size:15px;font-weight:600;line-height:1.4}
+.dsh-web-search-settings__copy small{overflow:hidden;color:var(--dsw-alias-label-tertiary);font-size:13px;line-height:1.5;text-overflow:ellipsis;white-space:nowrap}
+.dsh-web-search-settings__summary{display:flex;flex:none;align-items:center;gap:10px;color:var(--dsw-alias-label-tertiary);font-size:12px;white-space:nowrap}
+.dsh-web-search-settings__summary[data-dirty="true"]{padding:1px 8px;border-radius:999px;background:var(--dsw-alias-bg-module-platform);color:var(--dsw-alias-label-secondary);font-size:11px;font-weight:500;line-height:17px}
+.dsh-web-search-settings__summary i{width:8px;height:8px;border-right:1.5px solid currentColor;border-bottom:1.5px solid currentColor;transform:rotate(45deg);transition:transform .16s}
+.dsh-web-search-settings.is-open .dsh-web-search-settings__summary i{transform:rotate(225deg)}
+.dsh-web-search-settings__body{margin:0 16px;padding-bottom:8px;border-top:1px solid var(--dsw-alias-border-l2)}
+@media(max-width:640px){.dsh-web-search-settings__summary{font-size:0}.dsh-web-search-settings__copy small{white-space:normal;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical}}
+@media(prefers-reduced-motion:reduce){.dsh-web-search-settings,.dsh-web-search-settings__summary i{transition:none}}
+`
+
+function installSettingsStyles(): void {
+  if (document.getElementById(STYLE_ID) !== null) return
+  const style = document.createElement('style')
+  style.id = STYLE_ID
+  style.textContent = settingsCss
+  document.head.append(style)
+}
 
 declare module '@deepseek-ai/dsh-client-ui-slots' {
   interface LocaleNamespaceMap {
@@ -22,7 +48,7 @@ type Provider = 'searxng' | 'wikipedia' | 'tavily' | 'brave' | 'gemini'
 interface SearchConfig {
   provider: Provider
   requestTimeoutMs: number
-  searxng: { baseURL: string; language: string; categories?: string | undefined; safeSearch: 0 | 1 | 2 }
+  searxng: { baseURL: string; language: string; categories?: string | undefined; engines?: string[] | undefined; retryCount: number; safeSearch: 0 | 1 | 2 }
   wikipedia: { language: string }
   tavily: { apiKeyEnv: string; searchDepth: 'basic' | 'advanced' | 'fast' | 'ultra-fast'; topic: 'general' | 'news' | 'finance' }
   gemini: { apiKeyEnv: string; model: string }
@@ -46,12 +72,18 @@ interface SettingsTestResult {
   firstTitle?: string | undefined
 }
 
-const card: CSSProperties = { listStyle: 'none', border: '1px solid var(--dsw-alias-border-l2)', borderRadius: 12, background: 'var(--dsw-alias-bg-layer-3)' }
-const header: CSSProperties = { width: '100%', appearance: 'none', display: 'flex', alignItems: 'center', gap: 12, padding: '14px 16px', border: 0, borderRadius: 12, background: 'none', color: 'inherit', cursor: 'pointer', textAlign: 'left', font: 'inherit' }
-const headText: CSSProperties = { flex: 1, minWidth: 0, display: 'flex', flexDirection: 'column', gap: 4 }
-const name: CSSProperties = { fontSize: 15, fontWeight: 600, lineHeight: 1.4, color: 'var(--dsw-alias-label-primary)' }
-const description: CSSProperties = { fontSize: 13, lineHeight: 1.5, color: 'var(--dsw-alias-label-tertiary)' }
-const body: CSSProperties = { borderTop: '1px solid var(--dsw-alias-border-l2)', margin: '0 16px', paddingBottom: 8 }
+interface EngineProbeResult {
+  name: string
+  categories: string[]
+  enabledByDefault: boolean
+  tested: boolean
+  available: boolean
+  resultCount: number
+  truncated: boolean
+  durationMs: number
+  error?: string
+}
+
 const field = (first = false): CSSProperties => ({ display: 'flex', flexDirection: 'column', gap: 6, padding: '12px 0', ...first ? {} : { borderTop: '1px solid var(--dsw-alias-border-l2)' } })
 const fieldHead: CSSProperties = { display: 'flex', alignItems: 'center', gap: 8 }
 const input: CSSProperties = { boxSizing: 'border-box', width: '100%', height: 34, padding: '0 12px', border: '1px solid var(--dsw-alias-border-l2)', borderRadius: 8, background: 'var(--dsw-alias-bg-layer-3)', color: 'var(--dsw-alias-label-primary)', font: 'inherit', fontSize: 13, lineHeight: 1.5 }
@@ -69,6 +101,7 @@ export const inject = ['slots', 'locale']
 
 /** Register one plugin-owned card in DSH's existing plugin settings page. */
 export function apply(ctx: ClientContext): void {
+  installSettingsStyles()
   ctx.effect(() => ctx.locale.register(LOCALE_NAMESPACE, { zh, en }), 'lemoncat7-web-search: dictionaries')
   ctx.slots.inject('settings.plugin.item', () => ctx.slots.register({
     name: 'settings.plugin.item',
@@ -142,17 +175,12 @@ export function MultiSearchSettingsCard({ t }: PropsLocale<typeof LOCALE_NAMESPA
   }
 
   return (
-    <li style={card}>
-      <button type="button" style={header} aria-expanded={open} aria-label={t(open ? 'card.collapse' : 'card.expand')} onClick={() => { setOpen(value => !value) }}>
-        <span style={headText}>
-          <span style={name}>{t('card.name')}</span>
-          <span style={description}>{t('card.description')}</span>
-        </span>
-        {dirty || apiKey !== '' ? <span style={{ fontSize: 12, color: '#d28b26' }}>{t('status.unsaved')}</span> : null}
-        <span aria-hidden="true" style={{ transform: open ? 'rotate(180deg)' : undefined }}>⌄</span>
+    <li className={`dsh-web-search-settings${open ? ' is-open' : ''}`}>
+      <button type="button" className="dsh-web-search-settings__header" aria-expanded={open} aria-label={t(open ? 'card.collapse' : 'card.expand')} onClick={() => { setOpen(value => !value) }}>
+        <span className="dsh-web-search-settings__copy"><strong>{t('card.name')}</strong><small>{t('card.description')}</small></span>
+        <span className="dsh-web-search-settings__summary" data-dirty={dirty || apiKey !== '' ? 'true' : 'false'}>{dirty || apiKey !== '' ? t('status.unsaved') : draft === undefined ? t('status.loading') : draft.provider}<i aria-hidden="true" /></span>
       </button>
-      {open ? (
-        <div style={body}>
+      {open ? <div className="dsh-web-search-settings__body">
           {draft === undefined ? <p role="status">{t('status.loading')}</p> : <>
             <div>
               <SelectField first label={t('field.provider')} value={draft.provider} onChange={value => { edit({ ...draft, provider: value as Provider }); setApiKey('') }}>
@@ -174,20 +202,52 @@ export function MultiSearchSettingsCard({ t }: PropsLocale<typeof LOCALE_NAMESPA
             <button type="button" style={{ ...button, ...(!dirty || saving || testing ? disabledButton : {}) }} disabled={!dirty || saving || testing} onClick={() => { if (snapshot !== undefined) { setDraft(snapshot.config); setApiKey(''); setDirty(false); setTestResult(undefined); setError(undefined) } }}>{t('action.discard')}</button>
             <button type="button" style={{ ...primaryButton, ...(!dirty || saving || testing || !valid(draft) ? disabledButton : {}) }} disabled={!dirty || saving || testing || !valid(draft)} onClick={() => { void save() }}>{t(saving ? 'action.saving' : 'action.save')}</button>
           </div>
-        </div>
-      ) : null}
+      </div> : null}
     </li>
   )
 }
 
 function ProviderFields(props: { t: TranslateNS<typeof LOCALE_NAMESPACE>; draft: SearchConfig; snapshot?: SettingsSnapshot | undefined; apiKey: string; setApiKey: (value: string) => void; edit: (next: SearchConfig) => void }) {
   const { draft } = props
+  const [engineQuery, setEngineQuery] = useState('DeepSeek')
+  const [engineProbes, setEngineProbes] = useState<EngineProbeResult[]>()
+  const [discovering, setDiscovering] = useState(false)
+  const [engineError, setEngineError] = useState<string>()
+  const discover = async () => {
+    setDiscovering(true); setEngineError(undefined)
+    try { setEngineProbes(await discoverEngines(draft, engineQuery)) }
+    catch (error: unknown) { setEngineError(error instanceof Error ? error.message : String(error)) }
+    finally { setDiscovering(false) }
+  }
+  const toggleEngine = (engine: string) => {
+    const selected = new Set(draft.searxng.engines ?? [])
+    if (selected.has(engine)) selected.delete(engine); else selected.add(engine)
+    props.edit({ ...draft, searxng: { ...draft.searxng, engines: [...selected] } })
+  }
   if (draft.provider === 'searxng') return <>
     <p style={notice}><strong>{props.t('searxng.noticeTitle')}</strong><br />{props.t('searxng.noticeBody')}</p>
     <TextField label={props.t('searxng.url')} value={draft.searxng.baseURL} onChange={baseURL => { props.edit({ ...draft, searxng: { ...draft.searxng, baseURL } }) }} hint={props.t('searxng.urlHint')} />
     <TextField label={props.t('searxng.language')} value={draft.searxng.language} onChange={language => { props.edit({ ...draft, searxng: { ...draft.searxng, language } }) }} hint={props.t('searxng.languageHint')} />
     <TextField label={props.t('searxng.categories')} value={draft.searxng.categories ?? ''} onChange={categories => { props.edit({ ...draft, searxng: { ...draft.searxng, ...(categories === '' ? { categories: undefined } : { categories }) } }) }} hint={props.t('searxng.categoriesHint')} />
+    <TextField label={props.t('searxng.retryCount')} type="number" value={String(draft.searxng.retryCount)} onChange={retryCount => { props.edit({ ...draft, searxng: { ...draft.searxng, retryCount: Number(retryCount) } }) }} hint={props.t('searxng.retryCountHint')} />
     <SelectField label={props.t('field.safeSearch')} value={String(draft.searxng.safeSearch)} onChange={value => { props.edit({ ...draft, searxng: { ...draft.searxng, safeSearch: Number(value) as 0 | 1 | 2 } }) }}><option value="0">{props.t('safeSearch.off')}</option><option value="1">{props.t('safeSearch.moderate')}</option><option value="2">{props.t('safeSearch.strict')}</option></SelectField>
+    <section style={field()} aria-label={props.t('searxng.engines')}>
+      <span style={label}>{props.t('searxng.engines')}</span>
+      <span style={hint}>{props.t('searxng.enginesHint')}</span>
+      <div style={{ display: 'flex', gap: 8 }}>
+        <input style={{ ...input, flex: 1 }} value={engineQuery} maxLength={200} onChange={event => { setEngineQuery(event.target.value) }} aria-label={props.t('searxng.probeQuery')} />
+        <button type="button" style={{ ...button, ...(discovering || engineQuery.trim() === '' ? disabledButton : {}) }} disabled={discovering || engineQuery.trim() === ''} onClick={() => { void discover() }}>{props.t(discovering ? 'searxng.probing' : 'searxng.probe')}</button>
+      </div>
+      {engineError ? <p role="alert" style={{ ...hint, color: 'var(--dsw-alias-label-error)' }}>{engineError}</p> : null}
+      {engineProbes ? <div style={{ display: 'grid', gap: 6, maxHeight: 320, overflow: 'auto' }}>
+        {engineProbes.map(engine => <label key={engine.name} style={{ display: 'grid', gridTemplateColumns: '20px minmax(100px, 1fr) auto auto', alignItems: 'center', gap: 8, padding: '7px 8px', borderRadius: 8, background: 'var(--dsw-alias-bg-module-platform)' }} title={engine.error}>
+          <input type="checkbox" checked={(draft.searxng.engines ?? []).includes(engine.name)} onChange={() => { toggleEngine(engine.name) }} />
+          <span style={{ fontSize: 13, color: 'var(--dsw-alias-label-primary)' }}>{engine.name}</span>
+          <span style={{ maxWidth: 150, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap', fontSize: 12, color: engine.available ? 'var(--dsw-alias-label-success, #2f9e62)' : engine.tested ? 'var(--dsw-alias-label-error)' : 'var(--dsw-alias-label-tertiary)' }}>{engine.available ? `${engine.resultCount}${engine.truncated ? '+' : ''} 条` : engine.tested ? engine.error || '不可用' : '未测试'}</span>
+          <span style={{ minWidth: 58, textAlign: 'right', fontSize: 12, color: 'var(--dsw-alias-label-tertiary)' }}>{engine.tested ? `${engine.durationMs} ms` : '—'}</span>
+        </label>)}
+      </div> : null}
+    </section>
   </>
   if (draft.provider === 'wikipedia') return <>
     <TextField label={props.t('wikipedia.language')} value={draft.wikipedia.language} onChange={language => { props.edit({ ...draft, wikipedia: { language } }) }} hint={props.t('wikipedia.languageHint')} />
@@ -232,6 +292,7 @@ function valid(config: SearchConfig | undefined): boolean {
     try {
       const url = new URL(config.searxng.baseURL)
       return (url.protocol === 'http:' || url.protocol === 'https:') && config.searxng.language.trim() !== ''
+        && Number.isInteger(config.searxng.retryCount) && config.searxng.retryCount >= 0 && config.searxng.retryCount <= 3
     } catch {
       return false
     }
@@ -248,7 +309,11 @@ async function testSettings(input: { config: SearchConfig; apiKey?: string }): P
   return request<SettingsTestResult>('POST', input)
 }
 
-async function request<T>(method: 'GET' | 'POST' | 'PUT', input?: { config: SearchConfig; apiKey?: string }): Promise<T> {
+async function discoverEngines(config: SearchConfig, query: string): Promise<EngineProbeResult[]> {
+  return request<EngineProbeResult[]>('POST', { action: 'discover-engines', config, query })
+}
+
+async function request<T>(method: 'GET' | 'POST' | 'PUT', input?: { config: SearchConfig; apiKey?: string; action?: 'discover-engines'; query?: string }): Promise<T> {
   const response = await fetch(SETTINGS_PATH, input === undefined ? { method } : {
     method,
     headers: { 'content-type': 'application/json' },
