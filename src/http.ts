@@ -104,7 +104,7 @@ export async function fetchJson(
  * network policy. Private and explicitly excluded hosts stay direct for local
  * SearXNG deployments.
  */
-function dispatcherFor(input: string | URL): Dispatcher | undefined {
+export function dispatcherFor(input: string | URL): Dispatcher | undefined {
   const proxyURL = process.env.DSH_WEB_SEARCH_PROXY?.trim()
   if (proxyURL === undefined || proxyURL.length === 0) return undefined
   const destination = new URL(input)

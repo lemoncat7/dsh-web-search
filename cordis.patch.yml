@@ -2,6 +2,7 @@
   name: '@deepseek-ai/dsh-web'
   config:
     searchProvider: lemoncat7-search
+    fetchProvider: lemoncat7-search
 
 - insert:
     - id: lemoncat7-web-search

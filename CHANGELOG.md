@@ -1,5 +1,12 @@
 # Changelog
 
+## 0.1.2
+
+- Provide the standard DSH `web_fetch` capability alongside `web_search`.
+- Add bounded `web_source` inspection for procedures that require raw HTML or script-embedded evidence removed by readable-page conversion.
+- Reuse the plugin-scoped proxy for direct public-page retrieval.
+- Block local, private, reserved, credential-bearing, non-HTTP, and binary fetch targets; revalidate bounded redirects and cap response bodies.
+
 ## 0.1.1
 
 - Discover general-purpose engines from the configured SearXNG `/config` endpoint.

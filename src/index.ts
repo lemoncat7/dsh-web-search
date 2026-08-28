@@ -6,10 +6,12 @@ import type {} from '@deepseek-ai/dsh-host-webserver'
 import { launchEnvironmentOf } from '@deepseek-ai/dsh-launch-environment'
 import { installSettingsSection, settingsNamespace } from '@deepseek-ai/dsh-settings'
 import z from '@deepseek-ai/schemastery'
-import type { WebSearchProvider } from '@deepseek-ai/dsh-web'
+import type { WebFetchProvider, WebSearchProvider } from '@deepseek-ai/dsh-web'
 import { BraveBackend } from './brave.ts'
 import { GeminiBackend } from './gemini.ts'
 import { DEFAULT_REQUEST_TIMEOUT_MS } from './http.ts'
+import { fetchPublicPage } from './fetch.ts'
+import { webSourceTool } from './source-tool.ts'
 import { SETTINGS_PATH, settingsHandler } from './settings-route.ts'
 import { SearxngBackend, discoverSearxngEngines, endpointFor } from './searxng.ts'
 import { TavilyBackend } from './tavily.ts'
@@ -41,7 +43,7 @@ export const WEB_SEARCH_MULTI_SETTINGS_NAMESPACE = settingsNamespace('lemoncat7-
 /** Cordis plugin name used in loader diagnostics. */
 export const name = 'lemoncat7-web-search'
 /** Host service required by this provider. */
-export const inject = ['web', 'credentials']
+export const inject = ['web', 'credentials', 'tools']
 
 /** Plugin configuration. Exactly one backend is active for each plugin row. */
 export interface Config {
@@ -170,6 +172,16 @@ export function apply(ctx: Context, config: Config): void {
     search: (request, signal) => backend.search(request, signal),
   }
   ctx.effect(() => ctx.web.registerSearchProvider(provider))
+  const fetchProvider: WebFetchProvider = {
+    id: PROVIDER_ID,
+    available: () => true,
+    fetch: (request, signal) => fetchPublicPage(request.url, {
+      timeoutMs: current().requestTimeoutMs ?? DEFAULT_REQUEST_TIMEOUT_MS,
+      ...(signal === undefined ? {} : { signal }),
+    }),
+  }
+  ctx.effect(() => ctx.web.registerFetchProvider(fetchProvider))
+  ctx.effect(() => ctx.tools.register(webSourceTool(() => current().requestTimeoutMs ?? DEFAULT_REQUEST_TIMEOUT_MS)))
 
   installSettingsSection(ctx, WEB_SEARCH_MULTI_SETTINGS_NAMESPACE, Config, config, {
     setSource: (source) => {

@@ -1,6 +1,6 @@
 # @lemoncat7/dsh-web-search
 
-面向 [DeepSeek Harness](https://github.com/deepseek-ai/deepseek-harness) 的可配置联网搜索插件。插件接管 DSH 原生 `web_search` 工具，模型不需要猜测或切换工具名称；管理员在设置中选择实际搜索来源。
+面向 [DeepSeek Harness](https://github.com/deepseek-ai/deepseek-harness) 的可配置联网插件。插件提供 DSH 原生 `web_search` 与 `web_fetch`：搜索由管理员选择的后端完成，网页抓取则通过同一套插件级代理和安全边界完成。另有受限的 `web_source`，供 Agent 按明确来源规则核验原始 HTML 标记或脚本内嵌数据；普通网页阅读仍应使用 `web_fetch`。
 
 ## 搜索来源
 
@@ -62,7 +62,7 @@ curl -fsS -X POST http://127.0.0.1:8080/search -d 'q=DeepSeek&format=json'
 
 ### 代理
 
-插件支持独立的出站代理，不会修改 DSH 或其他插件的全局网络行为：
+插件的搜索与网页抓取共用独立的出站代理，不会修改 DSH 或其他插件的全局网络行为：
 
 ```bash
 export DSH_WEB_SEARCH_PROXY=http://127.0.0.1:7893
@@ -79,11 +79,13 @@ Brave、Tavily 与 Gemini 的密钥通过 DSH Credential Store 保存，不写�
 
 ## 安全边界
 
-- 外部 JSON 响应限制为 2 MiB，并在进入 DSH 前校验结构。
-- 拒绝 HTTP 重定向，避免查询或凭据被静默转发。
+- 搜索 JSON 与网页正文均限制为 2 MiB；搜索结果在进入 DSH 前校验结构。
+- `web_fetch` 只接受无凭据的 HTTP(S) 公网地址，拒绝回环、私网、链路本地与保留目标。
+- `web_fetch` 最多跟随 5 次重定向，并在每一跳重新执行目标校验；只返回 HTML、文本、JSON 与 XML 等文本内容。
+- `web_source` 复用相同的安全抓取，只能对一个精确 URL 做分段读取或查找有限个源码标记，单次最多返回 120,000 字符。
 - API Key 只放在提供方规定的认证 Header 中，不出现在 URL 和结果里。
 - 浏览器设置接口执行严格同源检查，写请求必须携带与当前 Host 完全匹配的 Origin；接口限制请求体大小且不会回显密钥。
-- 插件只提供搜索，不提供任意 URL 抓取工具。
+- `web_fetch`／`web_source` 是受限的只读公网抓取能力，不提供内网访问、文件协议或任意命令执行。
 
 ## 开发验证
 
