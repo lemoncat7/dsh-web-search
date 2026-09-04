@@ -1,5 +1,10 @@
 # Changelog
 
+## 0.2.1
+
+- Migrate the host, settings, credentials, tools, and client UI integration to DeepSeek Harness `0.1.2-rc.1`.
+- Build and deployment-test the release on the DSH `0.1.2-rc.1` API family.
+
 ## 0.1.2
 
 - Provide the standard DSH `web_fetch` capability alongside `web_search`.

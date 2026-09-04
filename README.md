@@ -2,6 +2,10 @@
 
 Configurable web access for [DeepSeek Harness](https://github.com/deepseek-ai/deepseek-harness). The plugin provides DSH's native `web_search` and `web_fetch` tools: administrators select the search backend, while direct public-page retrieval uses the same plugin-scoped proxy and security boundary. A constrained `web_source` tool is also available when an agent must verify raw HTML markers or script-embedded data under an explicit source procedure; normal page reading remains the job of `web_fetch`.
 
+## Compatibility
+
+Release `0.2.1` is built and deployment-tested against DeepSeek Harness `0.1.2-rc.1` on Node.js `22.19+` or `24+`. Its DSH host, settings, credentials, tools, locale, and client UI peer contracts target the `0.1.2-rc.1` API family.
+
 Supported providers:
 
 - SearXNG — self-hosted, keyless general web search

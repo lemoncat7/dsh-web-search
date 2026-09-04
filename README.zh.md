@@ -2,6 +2,10 @@
 
 面向 [DeepSeek Harness](https://github.com/deepseek-ai/deepseek-harness) 的可配置联网插件。插件提供 DSH 原生 `web_search` 与 `web_fetch`：搜索由管理员选择的后端完成，网页抓取则通过同一套插件级代理和安全边界完成。另有受限的 `web_source`，供 Agent 按明确来源规则核验原始 HTML 标记或脚本内嵌数据；普通网页阅读仍应使用 `web_fetch`。
 
+## 兼容性
+
+正式版 `0.2.1` 针对 DeepSeek Harness `0.1.2-rc.1` 构建并完成部署验证，需要 Node.js `22.19+` 或 `24+`。插件使用的 DSH 宿主、设置、凭据、工具、语言与客户端 UI 接口均对应 `0.1.2-rc.1`。
+
 ## 搜索来源
 
 | 提供方 | 密钥 | 适用场景 |
@@ -25,7 +29,7 @@ dsh plugin --profile web add @lemoncat7/dsh-web-search
 ```bash
 npm install
 npm run check
-dsh plugin --profile web add ./dist/lemoncat7-dsh-web-search-0.1.0-alpha.5.tgz
+dsh plugin --profile web add ./dist/lemoncat7-dsh-web-search-0.2.1.tgz
 ```
 
 安装后进入 **设置 → 插件 → 插件配置 → 联网搜索**。可以选择提供方、保存密钥、调整超时和安全搜索，并在保存前执行一次真实测试。
