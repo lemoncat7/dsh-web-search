@@ -1,10 +1,10 @@
 /** Configurable web search provider for DeepSeek Harness. */
 
-import type { Context } from '@deepseek-ai/cordis'
+import type { Context, Volatile } from '@deepseek-ai/cordis'
 import { credentialRef } from '@deepseek-ai/dsh-credentials'
 import type {} from '@deepseek-ai/dsh-host-webserver'
 import { launchEnvironmentOf } from '@deepseek-ai/dsh-launch-environment'
-import type { SettingsProvider } from '@deepseek-ai/dsh-settings'
+import type { SettingsForms } from '@deepseek-ai/dsh-settings'
 import z from '@deepseek-ai/schemastery'
 import type { WebFetchProvider, WebSearchProvider } from '@deepseek-ai/dsh-web'
 import { BraveBackend } from './brave.ts'
@@ -87,7 +87,7 @@ const WikipediaSchema: z<WikipediaConfig> = z.object({
   language: z.string().default('en'),
 })
 
-export const Config: z<Config> = z.object({
+export const Config = z.object({
   provider: z.union(['searxng', 'brave', 'tavily', 'gemini', 'wikipedia'] as const).default('wikipedia'),
   requestTimeoutMs: z.number().min(1_000).max(55_000).step(1_000).default(DEFAULT_REQUEST_TIMEOUT_MS),
   searxng: SearxngSchema,
@@ -95,12 +95,12 @@ export const Config: z<Config> = z.object({
   tavily: TavilySchema,
   gemini: GeminiSchema,
   wikipedia: WikipediaSchema,
-})
+}).volatile()
 
 /** Environment lookup used to keep credentials out of Cordis config. */
 export type EnvironmentReader = (name: string) => string | undefined
 
-type RuntimeContext = Context & { settings: SettingsProvider }
+type RuntimeContext = Context & { settings: SettingsForms }
 
 /** Resolve and validate the selected external backend. */
 export function createBackend(config: Config, environment: EnvironmentReader, credentials: CredentialReader): SearchBackend {
@@ -163,16 +163,25 @@ export function createBackend(config: Config, environment: EnvironmentReader, cr
 }
 
 /** Register the selected backend under the stable provider id. */
-export function apply(context: Context, config: Config): void {
+export function apply(context: Context, config: Volatile<Config>): void {
   const ctx = context as RuntimeContext
   const environment: EnvironmentReader = key => launchEnvironmentOf(ctx).get(key)?.value
   const credentials: CredentialReader = async reference => (await ctx.credentials.resolve(credentialRef(reference)))?.value
-  let current: () => Config = () => config
-  let backend = createBackend(config, environment, credentials)
+  const current = (): Config => structuredClone(config.get()) as Config
+  let source = config.get()
+  let backend = createBackend(current(), environment, credentials)
+  const activeBackend = (): SearchBackend => {
+    const next = config.get()
+    if (next !== source) {
+      backend = createBackend(current(), environment, credentials)
+      source = next
+    }
+    return backend
+  }
   const provider: WebSearchProvider = {
     id: PROVIDER_ID,
-    available: () => backend.available(),
-    search: (request, signal) => backend.search(request, signal),
+    available: () => activeBackend().available(),
+    search: (request, signal) => activeBackend().search(request, signal),
   }
   ctx.effect(() => ctx.web.registerSearchProvider(provider))
   const fetchProvider: WebFetchProvider = {
@@ -186,17 +195,7 @@ export function apply(context: Context, config: Config): void {
   ctx.effect(() => ctx.web.registerFetchProvider(fetchProvider))
   ctx.effect(() => ctx.tools.register(webSourceTool(() => current().requestTimeoutMs ?? DEFAULT_REQUEST_TIMEOUT_MS)))
 
-  ctx.settings.installSection(ctx, WEB_SEARCH_MULTI_SETTINGS_NAMESPACE, Config, config, {
-    setSource: (source) => {
-      current = source
-    },
-    validate: (candidate) => {
-      createBackend(candidate, environment, credentials)
-    },
-    onChange: () => {
-      backend = createBackend(current(), environment, credentials)
-    },
-  })
+  ctx.effect(() => ctx.settings.configure({ auto: false }))
 
   ctx.inject(['webServer', 'settings'], (injectedCtx) => {
     const webCtx = injectedCtx as RuntimeContext & typeof injectedCtx
@@ -253,6 +252,8 @@ export function apply(context: Context, config: Config): void {
           }, query)
         },
         write: async (value, apiKey) => {
+          const next = value as Config
+          createBackend(next, environment, credentials)
           await webCtx.settings.update(WEB_SEARCH_MULTI_SETTINGS_NAMESPACE, value as Config)
           if (apiKey !== undefined && apiKey.trim().length > 0) {
             const reference = credentialReferenceFor(current())

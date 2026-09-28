@@ -4,6 +4,7 @@ import type { Context as ClientContext } from '@deepseek-ai/cordis'
 import type {} from '@deepseek-ai/dsh-client-ui-renderer/client'
 import type {} from '@deepseek-ai/dsh-client-locale/client'
 import type {} from '@deepseek-ai/dsh-client-ui-settings-plugins/client'
+import type {} from '@deepseek-ai/dsh-client-ui-settings/client'
 import type { PropsLocale, TranslateNS } from '@deepseek-ai/dsh-client-ui-slots'
 import { useEffect, useState, type CSSProperties, type ReactNode } from 'react'
 import { en, zh, type WebSearchMultiLocaleKey } from './locales.ts'
@@ -104,9 +105,10 @@ export const inject = ['slots', 'locale']
 export function apply(ctx: ClientContext): void {
   installSettingsStyles()
   ctx.effect(() => ctx.locale.register(LOCALE_NAMESPACE, { zh, en }), 'lemoncat7-web-search: dictionaries')
-  ctx.slots.inject('settings.plugin.item', () => ctx.slots.register({
-    name: 'settings.plugin.item',
-    key: 'lemoncat7-web-search',
+  ctx.slots.inject('settings.plugins.tab', () => ctx.slots.register({
+    name: 'settings.plugins.tab',
+    id: 'lemoncat7-web-search',
+    label: () => '网页搜索',
     locale: LOCALE_NAMESPACE,
   }, MultiSearchSettingsCard))
 }

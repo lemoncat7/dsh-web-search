@@ -1,5 +1,7 @@
 # @lemoncat7/dsh-web-search
 
+> 当前兼容分支 `compat/dsh-017-rc2` 面向 **DSH 0.1.7-rc.2**，使用 Node.js 22 构建并在隔离容器验证。此分支尚未发布，不应安装到旧宿主；下文旧版本说明仅适用于对应历史发行版。外部真实渠道、远端主机及付费模型调用不在隔离测试范围内。
+
 Configurable web access for [DeepSeek Harness](https://github.com/deepseek-ai/deepseek-harness). The plugin provides DSH's native `web_search` and `web_fetch` tools: administrators select the search backend, while direct public-page retrieval uses the same plugin-scoped proxy and security boundary. A constrained `web_source` tool is also available when an agent must verify raw HTML markers or script-embedded data under an explicit source procedure; normal page reading remains the job of `web_fetch`.
 
 ## Compatibility
