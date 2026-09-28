@@ -4,7 +4,7 @@
 
 ## 兼容性
 
-正式版 `0.2.1` 针对 DeepSeek Harness `0.1.2-rc.1` 构建并完成部署验证，需要 Node.js `22.19+` 或 `24+`。插件使用的 DSH 宿主、设置、凭据、工具、语言与客户端 UI 接口均对应 `0.1.2-rc.1`。
+正式版 `0.3.0` 针对 DeepSeek Harness `0.1.7-rc.2` 构建并完成验证，需要 Node.js `^22.19.0` 或 `>=24.0.0`。插件为正式版，宿主仍为 RC；旧宿主请保留 `0.2.1`。升级前源码标签为 `pre-dsh-0.1.7-rc.2`，详见 [发布说明](docs/releases/0.3.0.md)。
 
 ## 搜索来源
 
@@ -29,7 +29,7 @@ dsh plugin --profile web add @lemoncat7/dsh-web-search
 ```bash
 npm install
 npm run check
-dsh plugin --profile web add ./dist/lemoncat7-dsh-web-search-0.2.1.tgz
+dsh plugin --profile web add ./dist/lemoncat7-dsh-web-search-0.3.0.tgz
 ```
 
 安装后进入 **设置 → 插件 → 插件配置 → 联网搜索**。可以选择提供方、保存密钥、调整超时和安全搜索，并在保存前执行一次真实测试。

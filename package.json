@@ -1,6 +1,6 @@
 {
   "name": "@lemoncat7/dsh-web-search",
-  "version": "0.2.1",
+  "version": "0.3.0",
   "description": "Configurable and secure multi-provider web search for DeepSeek Harness",
   "homepage": "https://github.com/lemoncat7/dsh-web-search#readme",
   "bugs": {
@@ -39,7 +39,8 @@
     "PUBLISHING.md",
     "deploy/**/*.yml",
     "examples/**/*.yml",
-    "LICENSE"
+    "LICENSE",
+    "docs/releases/0.3.0.md"
   ],
   "engines": {
     "node": "^22.19 || >=24"
