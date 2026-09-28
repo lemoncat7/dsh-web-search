@@ -1,12 +1,12 @@
 # @lemoncat7/dsh-web-search
 
-> 当前正式版 **0.3.0**，适配并验证 **DSH 0.1.7-rc.2**。插件为正式版，宿主仍为 RC；不支持直接用于旧宿主。Node.js **^22.19.0 或 >=24.0.0**。旧版源码保留于 `pre-dsh-0.1.7-rc.2`；详见 [0.3.0 发布说明](docs/releases/0.3.0.md)。
+> 当前正式版 **0.3.1**，适配并验证 **DSH 0.1.7-rc.2**。插件为正式版，宿主仍为 RC；不支持直接用于旧宿主。Node.js **^22.19.0 或 >=24.0.0**。旧版源码保留于 `pre-dsh-0.1.7-rc.2`；详见 [0.3.1 发布说明](docs/releases/0.3.1.md)。
 
 Configurable web access for [DeepSeek Harness](https://github.com/deepseek-ai/deepseek-harness). The plugin provides DSH's native `web_search` and `web_fetch` tools: administrators select the search backend, while direct public-page retrieval uses the same plugin-scoped proxy and security boundary. A constrained `web_source` tool is also available when an agent must verify raw HTML markers or script-embedded data under an explicit source procedure; normal page reading remains the job of `web_fetch`.
 
 ## Compatibility
 
-Stable plugin release `0.3.0` targets and has been verified with DeepSeek Harness `0.1.7-rc.2` on Node.js `^22.19.0` or `>=24.0.0`. The host is still a release candidate. Older hosts should retain `0.2.1`; this release does not claim compatibility with untested future hosts.
+Stable plugin release `0.3.1` targets and has been verified with DeepSeek Harness `0.1.7-rc.2` on Node.js `^22.19.0` or `>=24.0.0`. The host is still a release candidate. Older hosts should retain `0.2.1`; this release does not claim compatibility with untested future hosts.
 
 Supported providers:
 

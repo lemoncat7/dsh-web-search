@@ -8,6 +8,7 @@ import type {} from '@deepseek-ai/dsh-client-ui-settings/client'
 import type { PropsLocale, TranslateNS } from '@deepseek-ai/dsh-client-ui-slots'
 import { useEffect, useState, type CSSProperties, type ReactNode } from 'react'
 import { en, zh, type WebSearchMultiLocaleKey } from './locales.ts'
+import { settingsSurfaceCss } from '../settings-surface.js'
 
 const SETTINGS_PATH = '/lemoncat7-web-search/settings'
 const LOCALE_NAMESPACE = 'lemoncat7-web-search'
@@ -34,7 +35,7 @@ function installSettingsStyles(): void {
   if (document.getElementById(STYLE_ID) !== null) return
   const style = document.createElement('style')
   style.id = STYLE_ID
-  style.textContent = settingsCss
+  style.textContent = settingsCss + settingsSurfaceCss
   document.head.append(style)
 }
 
@@ -88,12 +89,12 @@ interface EngineProbeResult {
 
 const field = (first = false): CSSProperties => ({ display: 'flex', flexDirection: 'column', gap: 6, padding: '12px 0', ...first ? {} : { borderTop: '1px solid var(--dsw-alias-border-l2)' } })
 const fieldHead: CSSProperties = { display: 'flex', alignItems: 'center', gap: 8 }
-const input: CSSProperties = { boxSizing: 'border-box', width: '100%', height: 34, padding: '0 12px', border: '1px solid var(--dsw-alias-border-l2)', borderRadius: 8, background: 'var(--dsw-alias-bg-layer-3)', color: 'var(--dsw-alias-label-primary)', font: 'inherit', fontSize: 13, lineHeight: 1.5 }
+const input: CSSProperties = { width: '100%', lineHeight: 1.5 }
 const label: CSSProperties = { flex: 1, minWidth: 0, fontSize: 13, fontWeight: 500, lineHeight: 1.5, color: 'var(--dsw-alias-label-primary)' }
 const hint: CSSProperties = { margin: 0, color: 'var(--dsw-alias-label-tertiary)', fontSize: 12, fontWeight: 400, lineHeight: 1.5 }
 const footer: CSSProperties = { display: 'flex', flexWrap: 'wrap', justifyContent: 'flex-end', alignItems: 'center', gap: 8, padding: '12px 0 4px', borderTop: '1px solid var(--dsw-alias-border-l2)' }
-const button: CSSProperties = { appearance: 'none', padding: '5px 14px', border: '1px solid var(--dsw-alias-border-l2)', borderRadius: 8, background: 'none', color: 'var(--dsw-alias-label-secondary)', cursor: 'pointer', font: 'inherit', fontSize: 13, lineHeight: 1.5 }
-const primaryButton: CSSProperties = { ...button, background: 'var(--dsw-alias-label-primary)', color: 'var(--dsw-alias-bg-layer-3)', borderColor: 'transparent' }
+const button: CSSProperties = { appearance: 'none', minHeight: 34, padding: '8px 13px', border: 0, borderRadius: 10, background: 'var(--ps-hover)', color: 'var(--ps-text)', cursor: 'pointer', font: 'inherit', fontSize: 13, lineHeight: 1.5 }
+const primaryButton: CSSProperties = { ...button, background: 'var(--ps-accent)', color: 'var(--ps-on-accent)' }
 const disabledButton: CSSProperties = { opacity: 0.4, cursor: 'default' }
 const statusText: CSSProperties = { flex: 1, minWidth: 150, margin: 0, fontSize: 12, lineHeight: 1.5 }
 const notice: CSSProperties = { margin: '12px 0 0', padding: '10px 12px', borderRadius: 8, background: 'var(--dsw-alias-bg-module-platform)', color: 'var(--dsw-alias-label-secondary)', fontSize: 12, lineHeight: 1.6 }
@@ -178,7 +179,7 @@ export function MultiSearchSettingsCard({ t }: PropsLocale<typeof LOCALE_NAMESPA
   }
 
   return (
-    <li className={`dsh-web-search-settings${open ? ' is-open' : ''}`}>
+    <li className={`dsh-plugin-settings dsh-web-search-settings${open ? ' is-open' : ''}`}>
       <button type="button" className="dsh-web-search-settings__header" aria-expanded={open} aria-label={t(open ? 'card.collapse' : 'card.expand')} onClick={() => { setOpen(value => !value) }}>
         <span className="dsh-web-search-settings__copy"><strong>{t('card.name')}</strong><small>{t('card.description')}</small></span>
         <span className="dsh-web-search-settings__summary" data-dirty={dirty || apiKey !== '' ? 'true' : 'false'}>{dirty || apiKey !== '' ? t('status.unsaved') : draft === undefined ? t('status.loading') : draft.provider}<i aria-hidden="true" /></span>
