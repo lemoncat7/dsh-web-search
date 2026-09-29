@@ -1,5 +1,11 @@
 # Changelog
 
+## 0.3.2
+
+- Support the official `dsh-app://app` Desktop origin on the loopback settings bridge, including cross-site fetch metadata.
+- Keep untrusted origins blocked; return structured 403 errors and handle non-JSON HTTP failures without masking them as JSON parsing errors.
+- Target DSH `0.1.7-rc.2`; 54 automated tests, type checks, build and package checks pass. Real Desktop validation remains pending.
+
 ## 0.2.1
 
 - Migrate the host, settings, credentials, tools, and client UI integration to DeepSeek Harness `0.1.2-rc.1`.

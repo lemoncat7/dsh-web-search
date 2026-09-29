@@ -9,6 +9,7 @@ import type { PropsLocale, TranslateNS } from '@deepseek-ai/dsh-client-ui-slots'
 import { useEffect, useState, type CSSProperties, type ReactNode } from 'react'
 import { en, zh, type WebSearchMultiLocaleKey } from './locales.ts'
 import { settingsSurfaceCss } from '../settings-surface.js'
+import { readSettingsResponse } from '../settings-response.js'
 
 const SETTINGS_PATH = '/lemoncat7-web-search/settings'
 const LOCALE_NAMESPACE = 'lemoncat7-web-search'
@@ -323,12 +324,5 @@ async function request<T>(method: 'GET' | 'POST' | 'PUT', input?: { config: Sear
     headers: { 'content-type': 'application/json' },
     body: JSON.stringify(input),
   })
-  const value = await response.json() as T | { error?: unknown }
-  if (!response.ok) {
-    const message = typeof value === 'object' && value !== null && 'error' in value && typeof value.error === 'string'
-      ? value.error
-      : `HTTP ${String(response.status)}`
-    throw new Error(message)
-  }
-  return value as T
+  return readSettingsResponse<T>(response)
 }

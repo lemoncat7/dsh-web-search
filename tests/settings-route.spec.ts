@@ -1,4 +1,4 @@
-import { createServer } from 'node:http'
+import { createServer, type IncomingHttpHeaders } from 'node:http'
 import type { AddressInfo } from 'node:net'
 import { afterEach, describe, expect, it, vi } from 'vitest'
 import { isTrustedSettingsRequest, SETTINGS_PATH, settingsHandler } from '../src/settings-route.ts'
@@ -10,6 +10,40 @@ afterEach(async () => {
 })
 
 describe('browser settings route', () => {
+  it.each(['127.0.0.1:19387', 'localhost:19387', '[::1]:19387'])('accepts official Desktop origin on %s including cross-site fetch metadata', host => {
+    for (const requireOrigin of [false, true]) {
+      expect(isTrustedSettingsRequest({ headers: { host, origin: 'dsh-app://app', 'sec-fetch-site': 'cross-site' } }, requireOrigin)).toBe(true)
+    }
+  })
+
+  it.each(['null', 'dsh-app://other', 'dsh-app://app.evil.test', 'dsh-app://app:19387', 'dsh-app://app/path', 'dsh-app://app/', 'https://evil.test', 'file://127.0.0.1:19387'])('rejects untrusted Desktop lookalike %s', origin => {
+    expect(isTrustedSettingsRequest({ headers: { host: '127.0.0.1:19387', origin } }, true)).toBe(false)
+  })
+
+  it('does not expand Desktop access to non-loopback hosts or array origins', () => {
+    for (const host of ['dsh.example:1443', '192.168.2.9:3080', 'localhost.evil.test:19387']) {
+      expect(isTrustedSettingsRequest({ headers: { host, origin: 'dsh-app://app' } }, true)).toBe(false)
+    }
+    const malformed = { host: 'localhost:19387', origin: ['dsh-app://app'] } as unknown as IncomingHttpHeaders
+    expect(isTrustedSettingsRequest({ headers: malformed }, false)).toBe(false)
+  })
+
+  it('serves Desktop reads, updates, tests and engine discovery through the HTTP bridge', async () => {
+    const api = { read: vi.fn(async () => snapshot()), write: vi.fn(async () => snapshot()), test: vi.fn(async () => testResult()), discoverEngines: vi.fn(async () => []) }
+    const base = await serve(api)
+    const headers = { origin: 'dsh-app://app', 'sec-fetch-site': 'cross-site', 'content-type': 'application/json' }
+    for (const [method, action] of [['GET', undefined], ['PUT', undefined], ['POST', undefined], ['POST', 'discover-engines']] as const) {
+      const response = await fetch(`${base}${SETTINGS_PATH}`, { method, headers, ...(method === 'GET' ? {} : { body: JSON.stringify({ config: { provider: 'searxng' }, action }) }) })
+      expect(response.status).toBe(200)
+      expect(response.headers.get('content-type')).toContain('application/json')
+      await response.json()
+    }
+    expect(api.read).toHaveBeenCalledOnce()
+    expect(api.write).toHaveBeenCalledOnce()
+    expect(api.test).toHaveBeenCalledOnce()
+    expect(api.discoverEngines).toHaveBeenCalledOnce()
+  })
+
   it('accepts an exact remote same-origin request without accepting cross-site writes', () => {
     const host = 'dsh.mochencloud.cn:1443'
     expect(isTrustedSettingsRequest({ headers: {
@@ -64,6 +98,8 @@ describe('browser settings route', () => {
       body,
     })
     expect(rejected.status).toBe(403)
+    expect(rejected.headers.get('content-type')).toContain('application/json')
+    expect(await rejected.json()).toEqual({ error: 'Forbidden: untrusted settings request origin' })
     expect(api.write).toHaveBeenCalledTimes(1)
   })
 

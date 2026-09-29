@@ -53,7 +53,7 @@ interface RequestHeaders {
   readonly headers: IncomingHttpHeaders
 }
 
-/** True when a request came from the same DSH Web origin. */
+/** Browser same-host requests, or the official Desktop origin on loopback. */
 export function isTrustedSettingsRequest(request: RequestHeaders, requireOrigin: boolean): boolean {
   const rawHost = singleHeader(request.headers, 'host')
   if (rawHost === undefined) return false
@@ -63,11 +63,17 @@ export function isTrustedSettingsRequest(request: RequestHeaders, requireOrigin:
   } catch {
     return false
   }
-  if (singleHeader(request.headers, 'sec-fetch-site') === 'cross-site') return false
   const origin = singleHeader(request.headers, 'origin')
+  // Desktop's custom scheme is cross-site relative to its local HTTP bridge.
+  // Match the serialized origin exactly: no wildcard schemes, ports or paths.
+  if (origin === 'dsh-app://app' && ['127.0.0.1', '[::1]', 'localhost'].includes(host.hostname)
+    && host.username === '' && host.password === '' && host.pathname === '/' && host.search === '' && host.hash === '') return true
+  if (singleHeader(request.headers, 'sec-fetch-site') === 'cross-site') return false
+  if (request.headers.origin !== undefined && origin === undefined) return false
   if (origin === undefined) return !requireOrigin
   try {
-    return new URL(origin).host === host.host
+    const source = new URL(origin)
+    return (source.protocol === 'http:' || source.protocol === 'https:') && source.host === host.host
   } catch {
     return false
   }
@@ -143,8 +149,7 @@ function isRecord(value: unknown): value is Record<string, unknown> {
 }
 
 function forbidden(response: ServerResponse): void {
-  response.writeHead(403)
-  response.end('forbidden')
+  json(response, 403, { error: 'Forbidden: untrusted settings request origin' })
 }
 
 function json(response: ServerResponse, status: number, value: unknown): void {
