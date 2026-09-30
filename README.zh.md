@@ -4,7 +4,7 @@
 
 ## 兼容性
 
-正式版 `0.3.2` 针对 DeepSeek Harness `0.1.7-rc.2` 构建，需要 Node.js `^22.19.0` 或 `>=24.0.0`。Desktop 来源兼容修复已通过自动化 HTTP 测试，尚未实测真实 Desktop 客户端。插件为正式版，宿主仍为 RC；旧宿主请保留 `0.2.1`。详见 [发布说明](docs/releases/0.3.2.md)。
+正式版 `0.3.3` 针对 DeepSeek Harness `0.2.0-rc.2` 构建，需要 Node.js `^22.19.0` 或 `>=24.0.0`。Desktop 来源兼容修复已通过自动化 HTTP 测试，尚未实测真实 Desktop 客户端。插件为正式版，宿主仍为 RC；DSH 0.1.7 请保留 `0.3.2`。详见 [发布说明](docs/releases/0.3.3.md)。
 
 ## 搜索来源
 

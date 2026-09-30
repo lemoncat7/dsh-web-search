@@ -1,12 +1,12 @@
 # @lemoncat7/dsh-web-search
 
-> 当前正式版 **0.3.2**，面向 **DSH 0.1.7-rc.2**。修复 Desktop 设置接口来源校验，已通过自动化测试，尚未实测真实 Desktop 客户端。Node.js **^22.19.0 或 >=24.0.0**。详见 [0.3.2 发布说明](docs/releases/0.3.2.md)。
+> 当前版本 **0.3.3**，已验证宿主 **DSH 0.2.0-rc.2**（宿主仍为 RC）。Node.js **^22.19.0 或 >=24.0.0**。详见 [兼容说明](docs/dsh-020-compatibility.md) 和 [发布说明](docs/releases/0.3.3.md)。
 
 Configurable web access for [DeepSeek Harness](https://github.com/deepseek-ai/deepseek-harness). The plugin provides DSH's native `web_search` and `web_fetch` tools: administrators select the search backend, while direct public-page retrieval uses the same plugin-scoped proxy and security boundary. A constrained `web_source` tool is also available when an agent must verify raw HTML markers or script-embedded data under an explicit source procedure; normal page reading remains the job of `web_fetch`.
 
 ## Compatibility
 
-Stable plugin release `0.3.2` targets DeepSeek Harness `0.1.7-rc.2` on Node.js `^22.19.0` or `>=24.0.0`. The Desktop origin fix is covered by automated HTTP tests, not a real Desktop client run. The host is still a release candidate. Older hosts should retain `0.2.1`; this release does not claim compatibility with untested future hosts.
+Stable plugin release `0.3.3` targets DeepSeek Harness `0.2.0-rc.2` on Node.js `^22.19.0` or `>=24.0.0`. The Desktop origin fix is covered by automated HTTP tests, not a real Desktop client run. The host is still a release candidate. Older hosts should retain `0.2.1`; this release does not claim compatibility with untested future hosts.
 
 Supported providers:
 
