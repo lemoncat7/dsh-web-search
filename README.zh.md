@@ -4,7 +4,7 @@
 
 ## 兼容性
 
-正式版 `0.3.3` 针对 DeepSeek Harness `0.2.0-rc.2` 构建，需要 Node.js `^22.19.0` 或 `>=24.0.0`。Desktop 来源兼容修复已通过自动化 HTTP 测试，尚未实测真实 Desktop 客户端。插件为正式版，宿主仍为 RC；DSH 0.1.7 请保留 `0.3.2`。详见 [发布说明](docs/releases/0.3.3.md)。
+适配 DeepSeek Harness **0.2.0-rc.2**（宿主仍为 RC），需要 Node.js **^22.19.0 或 >=24.0.0**。其他宿主版本请先查阅[兼容说明](docs/dsh-020-compatibility.md)和对应版本的发布说明。 Desktop 来源兼容已通过自动化 HTTP 测试，尚未实测真实 Desktop 客户端。
 
 ## 搜索来源
 
@@ -29,7 +29,8 @@ dsh plugin --profile web add @lemoncat7/dsh-web-search
 ```bash
 npm install
 npm run check
-dsh plugin --profile web add ./dist/lemoncat7-dsh-web-search-0.3.1.tgz
+npm pack --pack-destination dist
+dsh plugin --profile web add ./dist/lemoncat7-dsh-web-search-<version>.tgz
 ```
 
 安装后进入 **设置 → 插件 → 插件配置 → 联网搜索**。可以选择提供方、保存密钥、调整超时和安全搜索，并在保存前执行一次真实测试。
@@ -103,3 +104,7 @@ npm run check:package
 ## 来源与许可
 
 本项目基于 MIT 许可的 [zmh2000829/dsh-web-search-multi](https://github.com/zmh2000829/dsh-web-search-multi) 进行独立维护和适配，保留原项目许可声明。当前代码同样使用 MIT License。
+
+## 版本记录
+
+历史变更见 [GitHub Releases](https://github.com/lemoncat7/dsh-web-search/releases)，维护约定见[发布文档](docs/releases/README.md)。
