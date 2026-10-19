@@ -4,7 +4,7 @@
 
 ## 兼容性
 
-适配 DeepSeek Harness **0.2.0-rc.2**（宿主仍为 RC），需要 Node.js **^22.19.0 或 >=24.0.0**。其他宿主版本请先查阅[兼容说明](docs/dsh-020-compatibility.md)和对应版本的发布说明。 Desktop 来源兼容已通过自动化 HTTP 测试，尚未实测真实 Desktop 客户端。
+适配 DeepSeek Harness **0.2.1-rc.2**（宿主仍为 RC），需要 Node.js **^22.19.0 或 >=24.0.0**。其他宿主版本请先查阅[兼容说明](docs/dsh-021-compatibility.md)和对应版本的发布说明。 Desktop 来源兼容已通过自动化 HTTP 测试，尚未实测真实 Desktop 客户端。
 
 ## 搜索来源
 

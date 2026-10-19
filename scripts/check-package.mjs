@@ -26,8 +26,6 @@ for (const required of [
   'lib/index.js',
   'lib/index.d.ts',
   'lib/client.js',
-  'lib/invariant.js',
-  'lib/invariant.d.ts',
   'deploy/searxng/compose.yml',
   'deploy/searxng/settings.yml',
   'docs/agent-installation.md',
