@@ -6,7 +6,7 @@ Configurable web access for [DeepSeek Harness](https://github.com/deepseek-ai/de
 
 ## Compatibility
 
-Targets DeepSeek Harness **0.2.1-rc.2** on Node.js **^22.19.0** or **>=24.0.0**. The host is still a release candidate. Desktop origin compatibility is covered by automated HTTP tests, not a real Desktop client run. See [compatibility](docs/dsh-021-compatibility.md) and the release notes for other host versions.
+Supports DeepSeek Harness **0.2.1-rc.2** as the minimum, with **0.2.1-rc.5** build and regression verification, on Node.js **^22.19.0** or **>=24.0.0**. The host is still a release candidate. Desktop origin compatibility is covered by automated HTTP tests, not a real Desktop client run. See [compatibility](docs/dsh-021-compatibility.md) and the release notes for other host versions.
 
 Supported providers:
 
