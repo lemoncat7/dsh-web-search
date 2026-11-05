@@ -67,3 +67,8 @@ Maintained as an MIT-licensed derivative of [zmh2000829/dsh-web-search-multi](ht
 ## Releases
 
 See [GitHub Releases](https://github.com/lemoncat7/dsh-web-search/releases) for version history and [release maintenance](docs/releases/README.md) for publishing conventions.
+
+
+## DSH 0.2.2-rc.1
+
+0.3.6 支持 DSH 0.2.2-rc.1，要求 Node.js >=24.9.0。[兼容说明](docs/compatibility-0.2.2-rc.1.md)。
