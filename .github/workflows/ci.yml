@@ -25,7 +25,11 @@ jobs:
           node-version: ${{ matrix.node }}
           cache: npm
       # Host peer dependencies are supplied by DSH; match the lockfile's install mode.
-      - run: npm ci --legacy-peer-deps
+      - run: npm ci --legacy-peer-deps --ignore-scripts
+      # The host's public declarations reference these peer packages. Supply them
+      # only in the isolated check environment, without changing the release lock.
+      - name: Install host declaration dependencies
+        run: npm install --no-save --package-lock=false --ignore-scripts --legacy-peer-deps @deepseek-ai/dsh-session-projection@0.2.2-rc.1 @deepseek-ai/dsh-package-manifest@0.2.2-rc.1
       - run: npm run check
 
   secret-scan:
