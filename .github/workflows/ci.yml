@@ -17,14 +17,15 @@ jobs:
     runs-on: ubuntu-latest
     strategy:
       matrix:
-        node: ['22.19.0', '24']
+        node: ['24.9.0', '24.19.0']
     steps:
       - uses: actions/checkout@v6
       - uses: actions/setup-node@v6
         with:
           node-version: ${{ matrix.node }}
           cache: npm
-      - run: npm ci
+      # Host peer dependencies are supplied by DSH; match the lockfile's install mode.
+      - run: npm ci --legacy-peer-deps
       - run: npm run check
 
   secret-scan:
