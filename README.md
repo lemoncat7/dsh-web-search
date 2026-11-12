@@ -6,7 +6,7 @@ Configurable web access for [DeepSeek Harness](https://github.com/deepseek-ai/de
 
 ## Compatibility
 
-Supports DeepSeek Harness **0.2.1-rc.2** as the minimum, with **0.2.1-rc.5** build and regression verification, on Node.js **^22.19.0** or **>=24.0.0**. The host is still a release candidate. Desktop origin compatibility is covered by automated HTTP tests, not a real Desktop client run. See [compatibility](docs/dsh-021-compatibility.md) and the release notes for other host versions.
+Supports DeepSeek Harness **0.2.2-rc.1 / 0.2.2-rc.2**, on Node.js **>=24.9.0**. See [compatibility](docs/compatibility-0.2.2-rc.2.md) for the isolated rc2 checks and their limits. This version includes the updated host compatibility declaration.
 
 Supported providers:
 
@@ -69,6 +69,6 @@ Maintained as an MIT-licensed derivative of [zmh2000829/dsh-web-search-multi](ht
 See [GitHub Releases](https://github.com/lemoncat7/dsh-web-search/releases) for version history and [release maintenance](docs/releases/README.md) for publishing conventions.
 
 
-## DSH 0.2.2-rc.1
+## DSH 0.2.2 兼容性
 
-0.3.6 支持 DSH 0.2.2-rc.1，要求 Node.js >=24.9.0。[兼容说明](docs/compatibility-0.2.2-rc.1.md)。
+当前版本 **0.3.7**，支持 DeepSeek Harness **0.2.2-rc.1 / 0.2.2-rc.2**，需要 Node.js **>=24.9.0**。rc2 隔离验证结果见[兼容说明](docs/compatibility-0.2.2-rc.2.md)。本版制品包含上述兼容声明。

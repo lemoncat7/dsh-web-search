@@ -18,9 +18,31 @@ jobs:
           ref: ${{ github.event.release.tag_name }}
       - uses: actions/setup-node@v6
         with:
-          node-version: 22.19.0
+          node-version: 24.19.0
           registry-url: https://registry.npmjs.org
-          cache: npm
-      - run: npm ci
-      - run: npm run check
-      - run: npm publish --access public --provenance
+      - name: Download the tested release artifact
+        env:
+          GH_TOKEN: ${{ github.token }}
+          RELEASE_TAG: ${{ github.event.release.tag_name }}
+        run: |
+          set -euo pipefail
+          version=$(node -p 'require("./package.json").version')
+          test "$RELEASE_TAG" = "v$version"
+          filename="lemoncat7-dsh-web-search-$version.tgz"
+          gh release download "$RELEASE_TAG" --pattern "$filename" --dir "$RUNNER_TEMP/release"
+          export RELEASE_FILE="$RUNNER_TEMP/release/$filename"
+          export RELEASE_DIGEST=$(gh api "repos/$GITHUB_REPOSITORY/releases/tags/$RELEASE_TAG" --jq ".assets[] | select(.name == \"$filename\") | .digest")
+          node --input-type=module <<'JS'
+          import fs from 'node:fs';
+          import assert from 'node:assert/strict';
+          import { createHash } from 'node:crypto';
+          import { execFileSync } from 'node:child_process';
+          const bytes = fs.readFileSync(process.env.RELEASE_FILE);
+          assert.equal('sha256:' + createHash('sha256').update(bytes).digest('hex'), process.env.RELEASE_DIGEST);
+          const pkg = JSON.parse(execFileSync('tar', ['-xOf', process.env.RELEASE_FILE, 'package/package.json'], { encoding: 'utf8' }));
+          assert.equal(pkg.name, '@lemoncat7/dsh-web-search');
+          assert.equal('v' + pkg.version, process.env.RELEASE_TAG);
+          JS
+          printf 'RELEASE_FILE=%s\n' "$RELEASE_FILE" >> "$GITHUB_ENV"
+      - name: Publish the verified artifact with provenance
+        run: npm publish "$RELEASE_FILE" --ignore-scripts --access public --provenance
