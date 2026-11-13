@@ -1,6 +1,6 @@
 {
   "name": "@lemoncat7/dsh-web-search",
-  "version": "0.3.7",
+  "version": "0.3.8",
   "description": "Configurable and secure multi-provider web search for DeepSeek Harness",
   "homepage": "https://github.com/lemoncat7/dsh-web-search#readme",
   "bugs": {
@@ -42,11 +42,12 @@
     "docs/releases/0.3.4.md",
     "docs/compatibility-0.2.2-rc.1.md",
     "docs/compatibility-0.2.2-rc.2.md",
-    "docs/releases/0.3.7.md"
+    "docs/releases/0.3.7.md",
+    "docs/host-compatibility-policy.md",
+    "docs/releases/0.3.8.md"
   ],
   "engines": {
-    "node": ">=24.9.0",
-    "dsh": "=0.2.2-rc.1 || =0.2.2-rc.2"
+    "node": ">=24.9.0"
   },
   "dsh": {
     "bundle": {
@@ -95,16 +96,16 @@
   },
   "peerDependencies": {
     "@deepseek-ai/cordis": "^4.1.0",
-    "@deepseek-ai/dsh-client-locale": "^0.2.2-rc.1",
-    "@deepseek-ai/dsh-client-ui-renderer": "^0.2.2-rc.1",
-    "@deepseek-ai/dsh-client-ui-settings-plugins": "^0.2.2-rc.1",
-    "@deepseek-ai/dsh-client-ui-slots": "^0.2.2-rc.1",
-    "@deepseek-ai/dsh-credentials": "^0.2.2-rc.1",
-    "@deepseek-ai/dsh-host-webserver": "^0.2.2-rc.1",
-    "@deepseek-ai/dsh-launch-environment": "^0.2.2-rc.1",
-    "@deepseek-ai/dsh-settings": "^0.2.2-rc.1",
-    "@deepseek-ai/dsh-tools": "^0.2.2-rc.1",
-    "@deepseek-ai/dsh-web": "^0.2.2-rc.1",
+    "@deepseek-ai/dsh-client-locale": "*",
+    "@deepseek-ai/dsh-client-ui-renderer": "*",
+    "@deepseek-ai/dsh-client-ui-settings-plugins": "*",
+    "@deepseek-ai/dsh-client-ui-slots": "*",
+    "@deepseek-ai/dsh-credentials": "*",
+    "@deepseek-ai/dsh-host-webserver": "*",
+    "@deepseek-ai/dsh-launch-environment": "*",
+    "@deepseek-ai/dsh-settings": "*",
+    "@deepseek-ai/dsh-tools": "*",
+    "@deepseek-ai/dsh-web": "*",
     "react": "^18.2.0"
   },
   "devDependencies": {
